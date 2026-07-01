@@ -1,0 +1,142 @@
+.navbar {
+    top: 80px;
+    color: #E8B923 !important;
+    border: 1px solid #E8B923 !important;
+    border-radius: 14px;
+    margin: 0 auto;
+    left: 0;
+    right: 0;
+    position: fixed;
+    width: 75%;
+    z-index: 999;
+    height: 60px;
+    position: fixed;
+    background-color: #E8B923 !important;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+    flex-wrap: wrap;
+}
+
+.d-flex {
+    align-items: center;
+    display: flex;
+    gap: 10px;
+}
+
+.navbar-brand {
+    color: #2F3A6B;
+    font: bold !important;
+}
+
+.btn {
+    color: #2F3A6B !important;
+    border: 1px solid #2F3A6B;
+    transition: all ease 0.5s;
+}
+
+.btn:hover {
+    color: #2F3A6B !important;
+    border: 1px solid #2F3A6B;
+    background-color: #f8eaba;
+}
+
+.form-control {
+    flex: 1;
+    min-width: 70px;
+
+}
+
+
+
+@media (max-width: 1107px) {
+    .d-flex {
+        max-width: 100%;
+        align-items: center;
+        text-align: center;
+    }
+
+    .navbar-brand {
+        font-size: 15px;
+        font-weight: 600;
+        padding: 0;
+    }
+
+    .form-control {
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 992px) {
+    .d-flex {
+        max-width: 100%;
+        align-items: center;
+        text-align: center;
+    }
+
+    .navbar-brand {
+        font-size: 15px;
+        font-weight: 600;
+        padding: 0;
+    }
+
+    .form-control {
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 768px) {
+    .menu-toggle {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        border: none;
+        color: white;
+        padding: 10px;
+        background-color: transparent;
+
+    }
+
+    .header-right {
+        display: none;
+    }
+
+    .mobile-menu.active {
+        display: flex;
+        border-radius: 20%;
+        border: 1px solid #E8B923;
+        width: 150px;
+    }
+
+    .d-flex {
+        padding: 0;
+        flex: 1 1;
+        width: 100%;
+    }
+
+    .navbar-brand {
+        font-size: 10px;
+        font-weight: 600;
+        padding: 0;
+        align-items: center;
+        justify-content: center;
+    }
+
+
+}
+
+@media (max-width: 498px) {
+    .d-flex {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    .navbar {
+        height: auto;
+        padding: 15px;
+    }
+}

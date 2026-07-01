@@ -1,0 +1,89 @@
+.product-list-container {
+  width: 100%;
+  max-width: 900px;
+  margin-top: 24px;
+}
+
+.product-list-title {
+  color: white;
+  font-size: 22px;
+  margin-bottom: 16px;
+}
+
+.product-list-empty {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 15px;
+}
+
+.product-list-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.product-list-table th,
+.product-list-table td {
+  padding: 12px 16px;
+  text-align: left;
+  font-size: 14px;
+}
+
+.product-list-table th {
+  background: #E8B923;
+  color: #2F3A6B;
+  font-weight: 700;
+}
+
+.product-list-table td {
+  border-bottom: 1px solid #eee;
+  color: #333;
+}
+
+.product-list-table tr:last-child td {
+  border-bottom: none;
+}
+
+.delete-btn {
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: background 0.2s;
+}
+
+.delete-btn:hover {
+  background: #c82333;
+}
+
+.confirm-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #333;
+}
+
+.confirm-yes {
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 4px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.confirm-no {
+  background: #6c757d;
+  color: white;
+  border: none;
+  padding: 4px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+}

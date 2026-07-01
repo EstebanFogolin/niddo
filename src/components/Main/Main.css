@@ -1,0 +1,14 @@
+.main {
+    width: 100%;
+    min-height: 100vh;
+    background-color: #2F3A6B;
+    padding-top: 80px;
+    padding-bottom: 40px;
+
+}
+
+@media (max-width: 498px){
+    .main{
+        padding-top: 220px;
+    }
+}
