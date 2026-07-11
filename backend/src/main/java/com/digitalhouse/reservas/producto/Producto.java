@@ -1,5 +1,7 @@
 package com.digitalhouse.reservas.producto;
 
+import com.digitalhouse.reservas.caracteristica.Caracteristica;
+import com.digitalhouse.reservas.categoria.Categoria;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -8,6 +10,9 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 import java.util.ArrayList;
@@ -27,17 +32,27 @@ public class Producto {
     @Column(nullable = false, length = 1000)
     private String descripcion;
 
-    private String categoria;
+    @ManyToOne
+    @JoinColumn(name = "categoria_id")
+    private Categoria categoria;
 
     @ElementCollection
     @CollectionTable(name = "producto_imagenes", joinColumns = @JoinColumn(name = "producto_id"))
     @Column(name = "url", nullable = false)
     private List<String> imagenes = new ArrayList<>();
 
+    @ManyToMany
+    @JoinTable(
+            name = "producto_caracteristicas",
+            joinColumns = @JoinColumn(name = "producto_id"),
+            inverseJoinColumns = @JoinColumn(name = "caracteristica_id")
+    )
+    private List<Caracteristica> caracteristicas = new ArrayList<>();
+
     public Producto() {
     }
 
-    public Producto(String nombre, String descripcion, String categoria, List<String> imagenes) {
+    public Producto(String nombre, String descripcion, Categoria categoria, List<String> imagenes) {
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.categoria = categoria;
@@ -68,11 +83,11 @@ public class Producto {
         this.descripcion = descripcion;
     }
 
-    public String getCategoria() {
+    public Categoria getCategoria() {
         return categoria;
     }
 
-    public void setCategoria(String categoria) {
+    public void setCategoria(Categoria categoria) {
         this.categoria = categoria;
     }
 
@@ -82,5 +97,13 @@ public class Producto {
 
     public void setImagenes(List<String> imagenes) {
         this.imagenes = imagenes;
+    }
+
+    public List<Caracteristica> getCaracteristicas() {
+        return caracteristicas;
+    }
+
+    public void setCaracteristicas(List<Caracteristica> caracteristicas) {
+        this.caracteristicas = caracteristicas;
     }
 }

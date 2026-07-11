@@ -1,0 +1,120 @@
+.category-filter {
+    margin-bottom: 24px;
+}
+
+.category-filter-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.category-filter-title {
+    font-size: 18px;
+    color: white;
+    margin: 0;
+}
+
+.category-clear-btn {
+    background: transparent;
+    border: 1px solid #e8b923;
+    color: #e8b923;
+    padding: 6px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.category-clear-btn:hover {
+    background: #e8b923;
+    color: #1a1a2e;
+}
+
+.category-filter-loading {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 14px;
+}
+
+.category-filter-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.category-filter-list.scrollable {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 8px;
+}
+
+.category-filter-list.scrollable::-webkit-scrollbar {
+    height: 6px;
+}
+
+.category-filter-list.scrollable::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+}
+
+.category-filter-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.category-filter-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.category-filter-btn.selected {
+    background: #e8b923;
+    border-color: #e8b923;
+    color: #1a1a2e;
+    font-weight: 600;
+}
+
+.category-filter-name {
+    font-weight: 500;
+}
+
+.category-filter-count {
+    opacity: 0.7;
+    font-size: 13px;
+}
+
+.category-filter-btn.selected .category-filter-count {
+    opacity: 0.9;
+}
+
+.category-filter-total {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 13px;
+    margin-top: 10px;
+    margin-bottom: 0;
+}
+
+@media (max-width: 768px) {
+    .category-filter-list {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        padding-bottom: 8px;
+    }
+
+    .category-filter-btn {
+        font-size: 13px;
+        padding: 6px 14px;
+    }
+}

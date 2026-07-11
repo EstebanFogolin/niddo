@@ -1,72 +1,69 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import ProductCard from "./ProductCard";
 import './Recommendations.css';
 import { ProductContext } from "../../context/ProductContext";
 
-const ITEMS_PER_PAGE = 10
+const MAX_RECOMMENDATIONS = 10
+
+function fisherYatesShuffle(array) {
+    const shuffled = [...array]
+    for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+    }
+    return shuffled
+}
+
+function pickRandom(array, count) {
+    if (array.length === 0) return []
+    const shuffled = fisherYatesShuffle(array)
+    return shuffled.slice(0, Math.min(count, shuffled.length))
+}
 
 const Recommendations = () => {
 
-  const { products } = useContext(ProductContext)
-  const [page, setPage] = useState(1)
+    const { products } = useContext(ProductContext)
+    const [randomProducts, setRandomProducts] = useState([])
 
-  const totalPages = Math.max(1, Math.ceil(products.length / ITEMS_PER_PAGE))
-  const safePage = page > totalPages ? totalPages : page
-  const startIndex = (safePage - 1) * ITEMS_PER_PAGE
-  const pageProducts = products.slice(startIndex, startIndex + ITEMS_PER_PAGE)
+    useEffect(() => {
+        setRandomProducts(pickRandom(products, MAX_RECOMMENDATIONS))
+    }, [products])
 
-  return (
-    <section className="recommendations-section">
-      <h2 className="recommendations-title">Recomendaciones</h2>
-      <div className="recommendations-grid">
-        {pageProducts.map((product) => (
-          <ProductCard
-            key={product.id}
-            id={product.id}
-            title={product.title}
-            category={product.category}
-            stars={product.stars}
-            score={product.score}
-            scoreLabel={product.scoreLabel}
-            distance={product.distance}
-            img={product.img}
-          />
-        ))}
-      </div>
+    const handleRefresh = () => {
+        setRandomProducts(pickRandom(products, MAX_RECOMMENDATIONS))
+    }
 
-      <div className="pagination">
-        <button
-          className="pagination-btn"
-          disabled={safePage <= 1}
-          onClick={() => setPage(1)}
-        >
-          {'<<'}
-        </button>
-        <button
-          className="pagination-btn"
-          disabled={safePage <= 1}
-          onClick={() => setPage(safePage - 1)}
-        >
-          {'<'}
-        </button>
-        <span className="pagination-info">{safePage} / {totalPages}</span>
-        <button
-          className="pagination-btn"
-          disabled={safePage >= totalPages}
-          onClick={() => setPage(safePage + 1)}
-        >
-          {'>'}
-        </button>
-        <button
-          className="pagination-btn"
-          disabled={safePage >= totalPages}
-          onClick={() => setPage(totalPages)}
-        >
-          {'>>'}
-        </button>
-      </div>
-    </section>
-  )
+    return (
+        <section className="recommendations-section">
+            <div className="recommendations-header">
+                <h2 className="recommendations-title">Recomendaciones</h2>
+                {products.length > 0 && (
+                    <button className="refresh-btn" onClick={handleRefresh}>
+                        ↻ Refrescar
+                    </button>
+                )}
+            </div>
+            {randomProducts.length === 0 ? (
+                <p className="recommendations-empty">No hay productos disponibles.</p>
+            ) : (
+                <div className="recommendations-grid">
+                    {randomProducts.map((product) => (
+                        <ProductCard
+                            key={product.id}
+                            id={product.id}
+                            title={product.title}
+                            category={product.category}
+                            stars={product.stars}
+                            score={product.score}
+                            scoreLabel={product.scoreLabel}
+                            distance={product.distance}
+                            img={product.img}
+                        />
+                    ))}
+                </div>
+            )}
+        </section>
+    )
 }
 
 export default Recommendations

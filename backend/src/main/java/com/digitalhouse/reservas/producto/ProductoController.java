@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -30,8 +31,15 @@ public class ProductoController {
     }
 
     @GetMapping
-    public List<ProductoResponse> listar() {
-        return productoService.listar();
+    public List<ProductoResponse> listar(
+            @RequestParam(required = false) List<Long> categoriaIds
+    ) {
+        return productoService.listar(categoriaIds);
+    }
+
+    @GetMapping("/{id}")
+    public ProductoResponse obtener(@PathVariable Long id) {
+        return productoService.obtenerPorId(id);
     }
 
     @DeleteMapping("/{id}")
@@ -45,9 +53,22 @@ public class ProductoController {
     public ProductoResponse crear(
             @RequestParam @NotBlank String nombre,
             @RequestParam @NotBlank String descripcion,
-            @RequestParam(defaultValue = "Hotel") String categoria,
-            @RequestParam("imagenes") @NotEmpty MultipartFile[] imagenes
+            @RequestParam(required = false) Long categoriaId,
+            @RequestParam("imagenes") @NotEmpty MultipartFile[] imagenes,
+            @RequestParam(required = false) List<Long> caracteristicas
     ) {
-        return productoService.crear(nombre, descripcion, categoria, imagenes);
+        return productoService.crear(nombre, descripcion, categoriaId, imagenes, caracteristicas);
+    }
+
+    @PutMapping("/{id}")
+    public ProductoResponse actualizar(
+            @PathVariable Long id,
+            @RequestParam(required = false) String nombre,
+            @RequestParam(required = false) String descripcion,
+            @RequestParam(required = false) Long categoriaId,
+            @RequestParam(value = "imagenes", required = false) MultipartFile[] imagenes,
+            @RequestParam(required = false) List<Long> caracteristicas
+    ) {
+        return productoService.actualizar(id, nombre, descripcion, categoriaId, imagenes, caracteristicas);
     }
 }

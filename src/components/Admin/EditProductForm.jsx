@@ -2,19 +2,17 @@ import { useContext, useState, useCallback, useEffect } from 'react'
 import './AddProductForm.css'
 import { ProductContext } from '../../context/ProductContext'
 
-const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp']
-const MAX_FILE_SIZE = 5 * 1024 * 1024
+const EditProductForm = ({ product, onClose }) => {
 
-const AddProductForm = ({ onClose }) => {
+    const { updateProduct, features, fetchFeatures, categories, fetchCategories } = useContext(ProductContext)
 
-    const { products, addProduct, features, fetchFeatures, categories, fetchCategories } = useContext(ProductContext)
+    const currentFeatureIds = (product.caracteristicas || []).map(c => c.id)
 
     const [formData, setFormData] = useState({
-        name: '',
-        description: '',
-        categoryId: '',
-        images: [],
-        caracteristicas: []
+        name: product.title || '',
+        description: product.description || '',
+        categoryId: product.categoryId || '',
+        caracteristicas: [...currentFeatureIds]
     })
 
     const [errors, setErrors] = useState({})
@@ -30,26 +28,12 @@ const AddProductForm = ({ onClose }) => {
         switch (name) {
             case 'name': {
                 const trimmed = value.trim()
-                if (!trimmed) return 'El nombre es obligatorio.'
-                if (trimmed.length < 3) return 'El nombre debe tener al menos 3 caracteres.'
+                if (trimmed && trimmed.length < 3) return 'El nombre debe tener al menos 3 caracteres.'
                 return ''
             }
             case 'description': {
                 const trimmed = value.trim()
-                if (!trimmed) return 'La descripción es obligatoria.'
-                if (trimmed.length < 10) return 'La descripción debe tener al menos 10 caracteres.'
-                return ''
-            }
-            case 'categoryId': {
-                if (!value) return 'Debe seleccionar una categoría.'
-                return ''
-            }
-            case 'images': {
-                if (!value || value.length === 0) return 'Debe seleccionar al menos una imagen.'
-                const invalidType = value.find(f => !ALLOWED_TYPES.includes(f.type))
-                if (invalidType) return 'Solo se permiten imágenes JPG, PNG o WEBP.'
-                const oversized = value.find(f => f.size > MAX_FILE_SIZE)
-                if (oversized) return 'Cada imagen debe pesar menos de 5 MB.'
+                if (trimmed && trimmed.length < 10) return 'La descripción debe tener al menos 10 caracteres.'
                 return ''
             }
             default:
@@ -64,19 +48,10 @@ const AddProductForm = ({ onClose }) => {
         setErrors(prev => ({ ...prev, [name]: error }))
     }
 
-    const handleImages = (e) => {
-        const files = Array.from(e.target.files)
-        setFormData(prev => ({ ...prev, images: files }))
-        const error = validateField('images', files)
-        setErrors(prev => ({ ...prev, images: error }))
-    }
-
     const validateForm = () => {
         const newErrors = {
             name: validateField('name', formData.name),
-            description: validateField('description', formData.description),
-            categoryId: validateField('categoryId', formData.categoryId),
-            images: validateField('images', formData.images)
+            description: validateField('description', formData.description)
         }
         setErrors(newErrors)
         return !Object.values(newErrors).some(Boolean)
@@ -86,18 +61,9 @@ const AddProductForm = ({ onClose }) => {
         e.preventDefault()
         if (!validateForm()) return
 
-        const exists = products.some(
-            (p) => p.title.toLowerCase() === formData.name.trim().toLowerCase()
-        )
-
-        if (exists) {
-            setErrors(prev => ({ ...prev, name: 'Ya existe un producto con ese nombre.' }))
-            return
-        }
-
         try {
             setSaving(true)
-            await addProduct({
+            await updateProduct(product.id, {
                 ...formData,
                 categoryId: formData.categoryId ? Number(formData.categoryId) : null
             })
@@ -115,9 +81,9 @@ const AddProductForm = ({ onClose }) => {
     return (
         <div className="form-overlay">
             <div className="form-container">
-                <h2 className="form-title">Agregar producto</h2>
+                <h2 className="form-title">Editar producto</h2>
 
-                {success && <p className="form-success">¡Producto agregado con éxito!</p>}
+                {success && <p className="form-success">¡Producto actualizado con éxito!</p>}
                 {errors.submit && <p className="form-error">{errors.submit}</p>}
 
                 <form onSubmit={handleSubmit} noValidate>
@@ -147,7 +113,7 @@ const AddProductForm = ({ onClose }) => {
                         {errors.description && <span className="field-error">{errors.description}</span>}
                     </div>
 
-                    <div className={`form-group${errors.categoryId ? ' has-error' : ''}`}>
+                    <div className="form-group">
                         <label htmlFor="categoryId">Categoría</label>
                         <select
                             id="categoryId"
@@ -160,24 +126,6 @@ const AddProductForm = ({ onClose }) => {
                                 <option key={cat.id} value={cat.id}>{cat.titulo}</option>
                             ))}
                         </select>
-                        {errors.categoryId && <span className="field-error">{errors.categoryId}</span>}
-                    </div>
-
-                    <div className={`form-group${errors.images ? ' has-error' : ''}`}>
-                        <label htmlFor="images">Imágenes</label>
-                        <input
-                            id="images"
-                            type="file"
-                            accept=".jpg,.jpeg,.png,.webp"
-                            multiple
-                            onChange={handleImages}
-                        />
-                        {errors.images ? (
-                            <span className="field-error">{errors.images}</span>
-                        ) : formData.images.length > 0 ? (
-                            <p className="form-img-count">{formData.images.length} imagen(es) seleccionada(s)</p>
-                        ) : null}
-                        <p className="form-hint">Formatos: JPG, PNG, WEBP — Máx. 5 MB por imagen</p>
                     </div>
 
                     {features.length > 0 && (
@@ -210,7 +158,7 @@ const AddProductForm = ({ onClose }) => {
                     <div className="form-actions">
                         <button type="button" className="btn-cancel" onClick={onClose}>Cancelar</button>
                         <button type="submit" className="btn-submit" disabled={saving}>
-                            {saving ? 'Guardando...' : 'Guardar producto'}
+                            {saving ? 'Guardando...' : 'Guardar cambios'}
                         </button>
                     </div>
                 </form>
@@ -219,4 +167,4 @@ const AddProductForm = ({ onClose }) => {
     )
 }
 
-export default AddProductForm
+export default EditProductForm

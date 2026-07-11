@@ -64,6 +64,19 @@ const ProductDetail = () => {
                     </div>
 
                     <p className="product-detail-description">{product.description}</p>
+
+                    {product.caracteristicas && product.caracteristicas.length > 0 && (
+                        <section className="product-detail-features">
+                            <h2>Qué ofrece este lugar</h2>
+                            <div className="features-grid">
+                                {product.caracteristicas.map((c, i) => (
+                                    <span key={i} className="feature-tag">
+                                        <i className={c.icono}></i> {c.nombre}
+                                    </span>
+                                ))}
+                            </div>
+                        </section>
+                    )}
                 </section>
             </main>
             <Footer />

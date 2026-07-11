@@ -1,0 +1,106 @@
+.register-page {
+    background-color: #2F3A6B;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 120px 16px 60px;
+}
+
+.register-container {
+    background: white;
+    border-radius: 12px;
+    padding: 40px 36px;
+    width: 100%;
+    max-width: 440px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+}
+
+.register-title {
+    font-size: 26px;
+    font-weight: bold;
+    color: #1a1a2e;
+    margin-bottom: 28px;
+    text-align: center;
+}
+
+.register-submit {
+    width: 100%;
+    background-color: #f5a623;
+    color: #1a1a2e;
+    font-weight: bold;
+    font-size: 16px;
+    border: none;
+    padding: 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: background 0.2s;
+}
+
+.register-submit:hover {
+    background-color: #e09510;
+}
+
+.register-submit:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.register-login-link {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 14px;
+    color: #555;
+}
+
+.register-login-link a {
+    color: #f5a623;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.register-login-link a:hover {
+    text-decoration: underline;
+}
+
+.register-confirmation {
+    text-align: center;
+}
+
+.confirmation-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: #28a745;
+    color: white;
+    font-size: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+}
+
+.confirmation-text {
+    font-size: 15px;
+    color: #555;
+    line-height: 1.6;
+    margin-bottom: 8px;
+}
+
+.resend-msg {
+    font-size: 14px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    margin-top: 12px;
+}
+
+.resend-msg.success {
+    background: #d4edda;
+    color: #155724;
+}
+
+.resend-msg.error {
+    background: #f8d7da;
+    color: #721c24;
+}

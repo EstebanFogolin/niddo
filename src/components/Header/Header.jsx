@@ -1,14 +1,20 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import logo from '../../assets/fondo_transparent.png';
 import "./Header.css";
-import { Link, Navigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { AuthContext } from '../../context/AuthContext';
 
 export const Header = () => {
 
+    const { user, isAuthenticated, logout } = useContext(AuthContext)
+    const navigate = useNavigate()
     const [menuOpen, setMenuOpen] = useState(false)
 
-    return (
+    const initials = user
+        ? (user.nombre.charAt(0) + user.apellido.charAt(0)).toUpperCase()
+        : ''
 
+    return (
         <header className="header">
             <div className="header-left">
                 <Link to='/'>
@@ -18,17 +24,32 @@ export const Header = () => {
             </div>
             <button
                 className="menu-toggle"
-                onClick={() => setMenuOpen(!menuOpen)
-                }
-
+                onClick={() => setMenuOpen(!menuOpen)}
             >
                 ☰
             </button>
             <div className={`header-right ${menuOpen ? 'mobile-menu active' : 'mobile-menu'}`}>
-                <button className='login-boton'>Iniciar sesión</button>
-                <button className='create-boton'>Crear cuenta</button>
+                {isAuthenticated ? (
+                    <div className="user-info">
+                        <div className="user-info-top">
+                            <span className="user-avatar">{initials}</span>
+                            <span className="user-name">{user.nombre} {user.apellido}</span>
+                        </div>
+                        <button className="logout-boton" onClick={() => { logout(); navigate('/') }}>
+                            Cerrar sesión
+                        </button>
+                    </div>
+                ) : (
+                    <>
+                        <button className='login-boton' onClick={() => navigate('/login')}>
+                            Iniciar sesión
+                        </button>
+                        <button className='create-boton' onClick={() => navigate('/registro')}>
+                            Crear cuenta
+                        </button>
+                    </>
+                )}
             </div>
         </header>
-
     )
 }
