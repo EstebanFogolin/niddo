@@ -1,6 +1,8 @@
 package com.digitalhouse.reservas.config;
 
 import com.digitalhouse.reservas.auth.JwtService;
+import com.digitalhouse.reservas.auth.Usuario;
+import com.digitalhouse.reservas.auth.UsuarioRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,14 +20,16 @@ import java.util.List;
 public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
+    private final UsuarioRepository usuarioRepository;
 
-    public JwtAuthFilter(JwtService jwtService) {
+    public JwtAuthFilter(JwtService jwtService, UsuarioRepository usuarioRepository) {
         this.jwtService = jwtService;
+        this.usuarioRepository = usuarioRepository;
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-            throws ServletException, IOException {
+            throws IOException, ServletException {
 
         String header = request.getHeader("Authorization");
 
@@ -34,16 +38,16 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
             if (jwtService.isValid(token)) {
                 String email = jwtService.extractEmail(token);
-                String role = jwtService.extractRole(token);
+                usuarioRepository.findByEmail(email).ifPresent(usuario -> {
+                    List<SimpleGrantedAuthority> authorities = List.of(
+                            new SimpleGrantedAuthority("ROLE_" + usuario.getRole())
+                    );
 
-                List<SimpleGrantedAuthority> authorities = List.of(
-                        new SimpleGrantedAuthority("ROLE_" + role)
-                );
+                    UsernamePasswordAuthenticationToken auth =
+                            new UsernamePasswordAuthenticationToken(usuario.getId(), null, authorities);
 
-                UsernamePasswordAuthenticationToken auth =
-                        new UsernamePasswordAuthenticationToken(email, null, authorities);
-
-                SecurityContextHolder.getContext().setAuthentication(auth);
+                    SecurityContextHolder.getContext().setAuthentication(auth);
+                });
             }
         }
 

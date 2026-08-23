@@ -1,4 +1,4 @@
-import { useContext, useEffect } from "react";
+import { memo, useContext, useEffect, useMemo } from "react";
 import Card from "../Cards/Card";
 import categoriesFallback from "../../data/Categories";
 import './CategoriesList.css';
@@ -11,7 +11,10 @@ const CategoriesList = () => {
     fetchCategories()
   }, [fetchCategories])
 
-  const displayCategories = categories.length > 0 ? categories : categoriesFallback
+  const displayCategories = useMemo(
+    () => categories.length > 0 ? categories : categoriesFallback,
+    [categories]
+  )
 
   return (
     <section className="category-section">
@@ -34,4 +37,4 @@ const CategoriesList = () => {
   )
 }
 
-export default CategoriesList;
+export default memo(CategoriesList);

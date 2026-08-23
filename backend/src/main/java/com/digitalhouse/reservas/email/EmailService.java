@@ -3,6 +3,7 @@ package com.digitalhouse.reservas.email;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -34,5 +35,14 @@ public class EmailService {
                 """, nombre, apellido, destinatario, frontendUrl));
 
         mailSender.send(mensaje);
+    }
+
+    @Async
+    public void enviarConfirmacionRegistroEnSegundoPlano(String destinatario, String nombre, String apellido) {
+        try {
+            enviarConfirmacionRegistro(destinatario, nombre, apellido);
+        } catch (Exception ignored) {
+            // Si el mail no esta configurado, el registro igual funciona
+        }
     }
 }

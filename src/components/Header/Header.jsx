@@ -6,7 +6,7 @@ import { AuthContext } from '../../context/AuthContext';
 
 export const Header = () => {
 
-    const { user, isAuthenticated, logout } = useContext(AuthContext)
+    const { user, isAuthenticated, isAdmin, logout } = useContext(AuthContext)
     const navigate = useNavigate()
     const [menuOpen, setMenuOpen] = useState(false)
 
@@ -30,15 +30,25 @@ export const Header = () => {
             </button>
             <div className={`header-right ${menuOpen ? 'mobile-menu active' : 'mobile-menu'}`}>
                 {isAuthenticated ? (
-                    <div className="user-info">
-                        <div className="user-info-top">
-                            <span className="user-avatar">{initials}</span>
-                            <span className="user-name">{user.nombre} {user.apellido}</span>
+                    <>
+                        <div className="user-info">
+                            <div className="user-info-top">
+                                <span className="user-avatar">{initials}</span>
+                                <span className="user-name">{user.nombre} {user.apellido}</span>
+                            </div>
+                            <button className="logout-boton" onClick={() => { logout(); navigate('/') }}>
+                                Cerrar sesión
+                            </button>
                         </div>
-                        <button className="logout-boton" onClick={() => { logout(); navigate('/') }}>
-                            Cerrar sesión
-                        </button>
-                    </div>
+                        <Link className="admin-boton" to="/favoritos" onClick={() => setMenuOpen(false)}>
+                            ♡ Favoritos
+                        </Link>
+                        {isAdmin && (
+                            <Link className="admin-boton" to="/administracion" onClick={() => setMenuOpen(false)}>
+                                Administración
+                            </Link>
+                        )}
+                    </>
                 ) : (
                     <>
                         <button className='login-boton' onClick={() => navigate('/login')}>

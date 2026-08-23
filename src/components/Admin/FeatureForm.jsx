@@ -1,4 +1,4 @@
-import { useContext, useState, useEffect } from 'react'
+import { memo, useContext, useState, useEffect } from 'react'
 import { ProductContext } from '../../context/ProductContext'
 import './AddProductForm.css'
 
@@ -107,4 +107,4 @@ const FeatureForm = ({ feature, onClose }) => {
     )
 }
 
-export default FeatureForm
+export default memo(FeatureForm)

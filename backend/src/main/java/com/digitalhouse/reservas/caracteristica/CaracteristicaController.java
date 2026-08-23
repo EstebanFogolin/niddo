@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/caracteristicas")
@@ -27,35 +26,29 @@ public class CaracteristicaController {
     }
 
     @GetMapping
-    public List<Map<String, Object>> listar() {
+    public List<CaracteristicaResponse> listar() {
         return service.listar()
                 .stream()
-                .map(c -> Map.<String, Object>of(
-                        "id", c.getId(),
-                        "nombre", c.getNombre(),
-                        "icono", c.getIcono()
-                ))
+                .map(CaracteristicaResponse::fromEntity)
                 .toList();
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Map<String, Object> crear(
+    public CaracteristicaResponse crear(
             @RequestParam String nombre,
             @RequestParam String icono
     ) {
-        Caracteristica c = service.crear(nombre, icono);
-        return Map.of("id", c.getId(), "nombre", c.getNombre(), "icono", c.getIcono());
+        return CaracteristicaResponse.fromEntity(service.crear(nombre, icono));
     }
 
     @PutMapping("/{id}")
-    public Map<String, Object> actualizar(
+    public CaracteristicaResponse actualizar(
             @PathVariable Long id,
             @RequestParam(required = false) String nombre,
             @RequestParam(required = false) String icono
     ) {
-        Caracteristica c = service.actualizar(id, nombre, icono);
-        return Map.of("id", c.getId(), "nombre", c.getNombre(), "icono", c.getIcono());
+        return CaracteristicaResponse.fromEntity(service.actualizar(id, nombre, icono));
     }
 
     @DeleteMapping("/{id}")

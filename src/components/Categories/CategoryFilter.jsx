@@ -1,4 +1,4 @@
-import { useContext, useEffect } from 'react'
+import { memo, useContext, useEffect, useMemo } from 'react'
 import { ProductContext } from '../../context/ProductContext'
 import './CategoryFilter.css'
 
@@ -9,9 +9,10 @@ const CategoryFilter = () => {
         fetchCategories()
     }, [fetchCategories])
 
-    const getCountByCategory = (catId) => {
-        return products.filter(p => Number(p.categoryId) === Number(catId)).length
-    }
+    const getCountByCategory = useMemo(
+        () => (catId) => products.filter(p => Number(p.categoryId) === Number(catId)).length,
+        [products]
+    )
 
     return (
         <section className="category-filter">
@@ -53,4 +54,4 @@ const CategoryFilter = () => {
     )
 }
 
-export default CategoryFilter
+export default memo(CategoryFilter)

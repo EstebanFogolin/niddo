@@ -1,0 +1,122 @@
+.favorites-page {
+    background-color: #2F3A6B;
+    min-height: 100vh;
+    padding-top: 96px;
+    padding-bottom: 60px;
+}
+
+.favorites-header {
+    padding: 0 24px 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.favorites-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #fff;
+    margin: 0 0 8px;
+}
+
+.favorites-count {
+    color: rgba(255,255,255,0.7);
+    font-size: 15px;
+    margin: 0;
+}
+
+.favorites-loading,
+.favorites-error {
+    padding: 32px;
+    text-align: center;
+    color: rgba(255,255,255,0.7);
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.favorites-error {
+    color: #ff6b6b;
+}
+
+.favorites-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 60px 24px;
+    max-width: 400px;
+    margin: 40px auto;
+    background: rgba(255,255,255,0.05);
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.empty-icon {
+    font-size: 64px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+}
+
+.favorites-empty-state h2 {
+    color: #fff;
+    font-size: 22px;
+    margin: 0 0 12px;
+}
+
+.favorites-empty-state p {
+    color: rgba(255,255,255,0.6);
+    font-size: 15px;
+    line-height: 1.6;
+    margin: 0 0 24px;
+}
+
+.favorites-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 0 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+@media (min-width: 640px) {
+    .favorites-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .favorites-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (min-width: 1400px) {
+    .favorites-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+.btn-primary {
+    padding: 14px 28px;
+    background: linear-gradient(135deg, #e8b923 0%, #d4a81e 100%);
+    color: #1a1a2e;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 16px rgba(232, 185, 35, 0.3);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(232, 185, 35, 0.4);
+}
+
+@media (max-width: 768px) {
+    .favorites-page {
+        padding-top: 120px;
+    }
+}

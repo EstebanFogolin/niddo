@@ -32,8 +32,12 @@ public class ProductoController {
 
     @GetMapping
     public List<ProductoResponse> listar(
-            @RequestParam(required = false) List<Long> categoriaIds
+            @RequestParam(required = false) List<Long> categoriaIds,
+            @RequestParam(required = false) String q
     ) {
+        if (q != null && !q.isBlank()) {
+            return productoService.buscar(q);
+        }
         return productoService.listar(categoriaIds);
     }
 

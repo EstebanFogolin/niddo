@@ -1,5 +1,5 @@
 import { useContext, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { AuthContext } from '../../context/AuthContext'
 import { Header } from '../Header/Header'
 import { Footer } from '../Footer/Footer'
@@ -8,6 +8,7 @@ import './LoginPage.css'
 const LoginPage = () => {
 
     const navigate = useNavigate()
+    const location = useLocation()
     const { login } = useContext(AuthContext)
 
     const [formData, setFormData] = useState({
@@ -55,15 +56,23 @@ const LoginPage = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault()
-        if (!validateForm()) return
+        console.log('[LoginPage] Form submitted')
+        if (!validateForm()) {
+            console.log('[LoginPage] Validation failed')
+            return
+        }
 
         try {
             setSaving(true)
             setServerError('')
-            await login(formData.email, formData.password)
-            navigate('/')
+            console.log('[LoginPage] Calling login API...')
+            const user = await login(formData.email, formData.password)
+            console.log('[LoginPage] Login successful, user:', user)
+            const destination = user.role === 'ADMIN' ? location.state?.from?.pathname : '/'
+            navigate(destination || '/')
         } catch (error) {
-            setServerError(error.message)
+            console.error('[LoginPage] Login error:', error)
+            setServerError(error.message || 'Error desconocido')
         } finally {
             setSaving(false)
         }

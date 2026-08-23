@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from 'react'
+import { useState, useEffect, useContext, useCallback } from 'react'
 import { AuthContext } from '../../context/AuthContext'
 import './ProductList.css'
 
@@ -12,25 +12,28 @@ const UserManagement = () => {
     const [error, setError] = useState('')
     const [changingId, setChangingId] = useState(null)
 
-    useEffect(() => {
-        const fetchUsers = async () => {
-            try {
-                const headers = getAuthHeaders()
-                const response = await fetch(`${API_URL}/api/admin/usuarios`, { headers })
+    const fetchUsers = useCallback(async () => {
+        try {
+            setLoading(true)
+            setError('')
+            const response = await fetch(`${API_URL}/api/admin/usuarios`, { headers: getAuthHeaders() })
 
-                if (!response.ok) throw new Error('No se pudieron cargar los usuarios.')
-
-                const data = await response.json()
-                setUsers(data)
-            } catch (err) {
-                setError(err.message)
-            } finally {
-                setLoading(false)
+            if (!response.ok) {
+                const apiError = await response.json().catch(() => null)
+                throw new Error(apiError?.mensaje || 'No se pudieron cargar los usuarios.')
             }
-        }
 
-        fetchUsers()
+            setUsers(await response.json())
+        } catch (err) {
+            setError(err.message)
+        } finally {
+            setLoading(false)
+        }
     }, [getAuthHeaders])
+
+    useEffect(function loadUsers() {
+        fetchUsers()
+    }, [fetchUsers])
 
     const toggleRole = async (userId) => {
         setChangingId(userId)
@@ -57,7 +60,10 @@ const UserManagement = () => {
 
     return (
         <div className="product-list-container">
-            <h2 className="product-list-title">Administrar usuarios</h2>
+            <div className="product-list-header">
+                <h2 className="product-list-title">Administrar usuarios</h2>
+                <button className="edit-btn" onClick={fetchUsers}>Actualizar lista</button>
+            </div>
 
             {users.length === 0 ? (
                 <p className="product-list-empty">No hay usuarios registrados.</p>

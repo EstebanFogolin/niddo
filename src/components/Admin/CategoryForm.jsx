@@ -1,4 +1,4 @@
-import { useContext, useState, useEffect } from 'react'
+import { memo, useContext, useState, useEffect } from 'react'
 import { ProductContext } from '../../context/ProductContext'
 import './AddProductForm.css'
 
@@ -126,4 +126,4 @@ const CategoryForm = ({ category, onClose }) => {
     )
 }
 
-export default CategoryForm
+export default memo(CategoryForm)

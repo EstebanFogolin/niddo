@@ -53,6 +53,18 @@
     background-color: #5b6ec2;
 }
 
+.admin-boton {
+    align-self: center;
+    color: #E8B923;
+    font-size: 14px;
+    font-style: normal;
+    text-decoration: none;
+}
+
+.admin-boton:hover {
+    color: white;
+}
+
 .create-boton{
     background-color: #E8B923;
     color: #2F3A6B;

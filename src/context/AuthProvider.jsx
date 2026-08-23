@@ -25,30 +25,40 @@ export const AuthProvider = ({ children }) => {
     }, [user])
 
     const login = useCallback(async (email, password) => {
-        const response = await fetch(`${API_URL}/api/auth/login`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: email.trim(), password })
-        })
+        console.log('[AuthProvider] Attempting login for:', email)
+        try {
+            const response = await fetch(`${API_URL}/api/auth/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: email.trim(), password })
+            })
 
-        if (response.status === 401) {
-            throw new Error('Email o contraseña incorrectos.')
-        }
+            console.log('[AuthProvider] Response status:', response.status)
 
-        if (!response.ok) {
-            throw new Error('Error al iniciar sesión. Intente nuevamente.')
-        }
+            if (response.status === 401) {
+                throw new Error('Email o contraseña incorrectos.')
+            }
 
-        const data = await response.json()
-        const userData = {
-            token: data.token,
-            nombre: data.nombre,
-            apellido: data.apellido,
-            email: data.email,
-            role: data.role
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}))
+                throw new Error(errorData.mensaje || 'Error al iniciar sesión. Intente nuevamente.')
+            }
+
+            const data = await response.json()
+            console.log('[AuthProvider] Login successful for:', data.email)
+            const userData = {
+                token: data.token,
+                nombre: data.nombre,
+                apellido: data.apellido,
+                email: data.email,
+                role: data.role
+            }
+            setUser(userData)
+            return userData
+        } catch (error) {
+            console.error('[AuthProvider] Login error:', error)
+            throw error
         }
-        setUser(userData)
-        return userData
     }, [])
 
     const logout = useCallback(() => {

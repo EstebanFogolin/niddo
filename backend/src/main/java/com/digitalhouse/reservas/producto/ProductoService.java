@@ -8,6 +8,7 @@ import com.digitalhouse.reservas.shared.NombreProductoDuplicadoException;
 import com.digitalhouse.reservas.shared.StorageException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,6 +20,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
+@Transactional
 public class ProductoService {
 
     private final ProductoRepository productoRepository;
@@ -46,6 +48,17 @@ public class ProductoService {
             productos = productoRepository.findAll();
         }
         return productos.stream()
+                .map(ProductoResponse::fromEntity)
+                .toList();
+    }
+
+    public List<ProductoResponse> buscar(String q) {
+        if (q == null || q.isBlank()) {
+            return listar(null);
+        }
+        String query = q.trim();
+        return productoRepository.findByNombreContainingIgnoreCaseOrDescripcionContainingIgnoreCase(query, query)
+                .stream()
                 .map(ProductoResponse::fromEntity)
                 .toList();
     }

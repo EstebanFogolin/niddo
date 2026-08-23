@@ -11,7 +11,7 @@ import { AuthContext } from '../../context/AuthContext'
 
 const AdminPanel = () => {
 
-  const { isAuthenticated, isAdmin } = useContext(AuthContext)
+  const { isAdmin } = useContext(AuthContext)
 
   const [showForm, setShowForm] = useState(false)
   const [showList, setShowList] = useState(false)
@@ -39,44 +39,34 @@ const AdminPanel = () => {
     )
   }
 
-  if (!isAuthenticated) {
-    return (
-      <>
-        <Header />
-        <div className='admin-panel'>
-          <p className='mobile-warning'>Debe iniciar sesión como administrador para acceder a esta sección.</p>
-        </div>
-        <Footer />
-      </>
-    )
-  }
-
   return (
     <>
       <Header />
       <div className='admin-panel'>
         <h1 className='panel-title'>Panel de administración</h1>
         <div className='admin-menu'>
-          <button className='admin-btn' onClick={() => { setShowForm(true); setShowList(false); setShowUsers(false) }}>
-            Agregar producto
-          </button>
-          <button className='admin-btn' onClick={() => { setShowList(!showList); setShowForm(false); setShowUsers(false) }}>
-            {showList ? 'Ocultar lista' : 'Lista de productos'}
-          </button>
           {isAdmin && (
-            <button className='admin-btn' onClick={() => { setShowUsers(!showUsers); setShowForm(false); setShowList(false); setShowFeatures(false) }}>
-              {showUsers ? 'Ocultar usuarios' : 'Administrar usuarios'}
-            </button>
+            <>
+              <button className='admin-btn' onClick={() => { setShowForm(true); setShowList(false); setShowUsers(false); setShowFeatures(false); setShowCategories(false) }}>
+                Agregar producto
+              </button>
+              <button className='admin-btn' onClick={() => { setShowList(!showList); setShowForm(false); setShowUsers(false); setShowFeatures(false); setShowCategories(false) }}>
+                {showList ? 'Ocultar lista' : 'Lista de productos'}
+              </button>
+            </>
           )}
           {isAdmin && (
-            <button className='admin-btn' onClick={() => { setShowFeatures(!showFeatures); setShowForm(false); setShowList(false); setShowUsers(false); setShowCategories(false) }}>
-              {showFeatures ? 'Ocultar características' : 'Administrar características'}
-            </button>
-          )}
-          {isAdmin && (
-            <button className='admin-btn' onClick={() => { setShowCategories(!showCategories); setShowForm(false); setShowList(false); setShowUsers(false); setShowFeatures(false) }}>
-              {showCategories ? 'Ocultar categorías' : 'Administrar categorías'}
-            </button>
+            <>
+              <button className='admin-btn' onClick={() => { setShowUsers(!showUsers); setShowForm(false); setShowList(false); setShowFeatures(false); setShowCategories(false) }}>
+                {showUsers ? 'Ocultar usuarios' : 'Administrar usuarios'}
+              </button>
+              <button className='admin-btn' onClick={() => { setShowFeatures(!showFeatures); setShowForm(false); setShowList(false); setShowUsers(false); setShowCategories(false) }}>
+                {showFeatures ? 'Ocultar características' : 'Administrar características'}
+              </button>
+              <button className='admin-btn' onClick={() => { setShowCategories(!showCategories); setShowForm(false); setShowList(false); setShowUsers(false); setShowFeatures(false) }}>
+                {showCategories ? 'Ocultar categorías' : 'Administrar categorías'}
+              </button>
+            </>
           )}
         </div>
         {showForm && <AddProductForm onClose={() => setShowForm(false)} />}

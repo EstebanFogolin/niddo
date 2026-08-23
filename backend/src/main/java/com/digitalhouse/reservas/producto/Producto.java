@@ -2,7 +2,10 @@ package com.digitalhouse.reservas.producto;
 
 import com.digitalhouse.reservas.caracteristica.Caracteristica;
 import com.digitalhouse.reservas.categoria.Categoria;
+import com.digitalhouse.reservas.reserva.Reserva;
+import com.digitalhouse.reservas.favorito.Favorito;
 import jakarta.persistence.CollectionTable;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
@@ -13,6 +16,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 import java.util.ArrayList;
@@ -49,6 +53,12 @@ public class Producto {
     )
     private List<Caracteristica> caracteristicas = new ArrayList<>();
 
+    @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Reserva> reservas = new ArrayList<>();
+
+    @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Favorito> favoritos = new ArrayList<>();
+
     public Producto() {
     }
 
@@ -59,51 +69,27 @@ public class Producto {
         this.imagenes = imagenes;
     }
 
-    public Long getId() {
-        return id;
-    }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    public String getNombre() { return nombre; }
+    public void setNombre(String nombre) { this.nombre = nombre; }
 
-    public String getNombre() {
-        return nombre;
-    }
+    public String getDescripcion() { return descripcion; }
+    public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
 
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
+    public Categoria getCategoria() { return categoria; }
+    public void setCategoria(Categoria categoria) { this.categoria = categoria; }
 
-    public String getDescripcion() {
-        return descripcion;
-    }
+    public List<String> getImagenes() { return imagenes; }
+    public void setImagenes(List<String> imagenes) { this.imagenes = imagenes; }
 
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
-    }
+    public List<Caracteristica> getCaracteristicas() { return caracteristicas; }
+    public void setCaracteristicas(List<Caracteristica> caracteristicas) { this.caracteristicas = caracteristicas; }
 
-    public Categoria getCategoria() {
-        return categoria;
-    }
+    public List<Reserva> getReservas() { return reservas; }
+    public void setReservas(List<Reserva> reservas) { this.reservas = reservas; }
 
-    public void setCategoria(Categoria categoria) {
-        this.categoria = categoria;
-    }
-
-    public List<String> getImagenes() {
-        return imagenes;
-    }
-
-    public void setImagenes(List<String> imagenes) {
-        this.imagenes = imagenes;
-    }
-
-    public List<Caracteristica> getCaracteristicas() {
-        return caracteristicas;
-    }
-
-    public void setCaracteristicas(List<Caracteristica> caracteristicas) {
-        this.caracteristicas = caracteristicas;
-    }
+    public List<Favorito> getFavoritos() { return favoritos; }
+    public void setFavoritos(List<Favorito> favoritos) { this.favoritos = favoritos; }
 }

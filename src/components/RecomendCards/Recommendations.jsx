@@ -1,53 +1,42 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useId, useMemo } from "react";
 import ProductCard from "./ProductCard";
 import './Recommendations.css';
 import { ProductContext } from "../../context/ProductContext";
 
 const MAX_RECOMMENDATIONS = 10
 
-function fisherYatesShuffle(array) {
-    const shuffled = [...array]
-    for (let i = shuffled.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
-    }
-    return shuffled
-}
+const hashProductId = (id, seed) => {
+    const value = `${seed}:${id}`
+    let hash = 0
 
-function pickRandom(array, count) {
-    if (array.length === 0) return []
-    const shuffled = fisherYatesShuffle(array)
-    return shuffled.slice(0, Math.min(count, shuffled.length))
+    for (let index = 0; index < value.length; index += 1) {
+        hash = ((hash << 5) - hash + value.charCodeAt(index)) | 0
+    }
+
+    return hash
 }
 
 const Recommendations = () => {
 
     const { products } = useContext(ProductContext)
-    const [randomProducts, setRandomProducts] = useState([])
+    const pageSeed = useId()
 
-    useEffect(() => {
-        setRandomProducts(pickRandom(products, MAX_RECOMMENDATIONS))
-    }, [products])
-
-    const handleRefresh = () => {
-        setRandomProducts(pickRandom(products, MAX_RECOMMENDATIONS))
-    }
+    const recommendedProducts = useMemo(() => {
+        return [...products]
+            .sort((first, second) => hashProductId(first.id, pageSeed) - hashProductId(second.id, pageSeed))
+            .slice(0, MAX_RECOMMENDATIONS)
+    }, [pageSeed, products])
 
     return (
         <section className="recommendations-section">
             <div className="recommendations-header">
                 <h2 className="recommendations-title">Recomendaciones</h2>
-                {products.length > 0 && (
-                    <button className="refresh-btn" onClick={handleRefresh}>
-                        ↻ Refrescar
-                    </button>
-                )}
             </div>
-            {randomProducts.length === 0 ? (
+            {recommendedProducts.length === 0 ? (
                 <p className="recommendations-empty">No hay productos disponibles.</p>
             ) : (
                 <div className="recommendations-grid">
-                    {randomProducts.map((product) => (
+                    {recommendedProducts.map((product) => (
                         <ProductCard
                             key={product.id}
                             id={product.id}
@@ -58,6 +47,7 @@ const Recommendations = () => {
                             scoreLabel={product.scoreLabel}
                             distance={product.distance}
                             img={product.img}
+                            showFavoriteButton
                         />
                     ))}
                 </div>

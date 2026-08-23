@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext, useCallback } from "react"
+import { useEffect, useState, useContext, useCallback, useMemo } from "react"
 import { ProductContext } from "./ProductContext"
 import { AuthContext } from "./AuthContext"
 
@@ -29,8 +29,17 @@ const mapApiProductToCard = (product) => {
     }
 }
 
-export const ProductProvider = ({ children }) => {
+function fetchJson(url, options) {
+    return fetch(url, options).then(async (res) => {
+        if (!res.ok) {
+            const err = await res.json().catch(() => null)
+            throw new Error(err?.mensaje || 'Error en la petición.')
+        }
+        return res.json()
+    })
+}
 
+export const ProductProvider = ({ children }) => {
     const { getAuthHeaders } = useContext(AuthContext)
 
     const [products, setProducts] = useState([])
@@ -42,24 +51,24 @@ export const ProductProvider = ({ children }) => {
     const [categoriesLoading, setCategoriesLoading] = useState(false)
     const [selectedCategoryIds, setSelectedCategoryIds] = useState([])
 
-    const doFetchProducts = useCallback(async (categoriaIds) => {
+    const doFetchProducts = useCallback(async (categoriaIds, q) => {
         try {
             setLoading(true)
-            const params = categoriaIds && categoriaIds.length > 0
-                ? `?categoriaIds=${categoriaIds.join(',')}`
-                : ''
-            const response = await fetch(`${API_URL}/api/productos${params}`)
-
-            if (!response.ok) {
-                throw new Error('No se pudieron cargar los productos.')
+            const params = new URLSearchParams()
+            if (categoriaIds && categoriaIds.length > 0) {
+                params.append('categoriaIds', categoriaIds.join(','))
             }
-
-            const data = await response.json()
+            if (q && q.trim()) {
+                params.append('q', q.trim())
+            }
+            const queryString = params.toString()
+            const url = `${API_URL}/api/productos${queryString ? `?${queryString}` : ''}`
+            const data = await fetchJson(url)
             const apiProducts = data.map(mapApiProductToCard)
             setProducts(apiProducts)
             setApiError('')
-        } catch {
-            setApiError('No se pudo conectar con el backend.')
+        } catch (e) {
+            setApiError(e.message || 'No se pudo conectar con el backend.')
         } finally {
             setLoading(false)
         }
@@ -72,9 +81,7 @@ export const ProductProvider = ({ children }) => {
     const fetchCategories = useCallback(async () => {
         try {
             setCategoriesLoading(true)
-            const response = await fetch(`${API_URL}/api/categorias`)
-            if (!response.ok) throw new Error('Error al cargar categorías.')
-            const data = await response.json()
+            const data = await fetchJson(`${API_URL}/api/categorias`)
             setCategories(data)
         } catch {
             console.warn('No se pudieron cargar las categorías.')
@@ -83,74 +90,58 @@ export const ProductProvider = ({ children }) => {
         }
     }, [])
 
-    const createCategory = async (titulo, descripcion, imagenUrl) => {
+    const createCategory = useCallback(async (titulo, descripcion, imagenUrl) => {
         const params = new URLSearchParams()
         params.append('titulo', titulo)
         params.append('descripcion', descripcion)
         params.append('imagenUrl', imagenUrl)
 
-        const response = await fetch(`${API_URL}/api/categorias`, {
+        const created = await fetchJson(`${API_URL}/api/categorias`, {
             method: 'POST',
             headers: { ...getAuthHeaders(), 'Content-Type': 'application/x-www-form-urlencoded' },
             body: params
         })
-        if (!response.ok) {
-            const err = await response.json().catch(() => null)
-            throw new Error(err?.mensaje || 'Error al crear la categoría.')
-        }
-        const created = await response.json()
         setCategories(prev => [...prev, created])
         return created
-    }
+    }, [getAuthHeaders])
 
-    const updateCategory = async (id, titulo, descripcion, imagenUrl) => {
+    const updateCategory = useCallback(async (id, titulo, descripcion, imagenUrl) => {
         const params = new URLSearchParams()
         if (titulo) params.append('titulo', titulo)
         if (descripcion) params.append('descripcion', descripcion)
         if (imagenUrl) params.append('imagenUrl', imagenUrl)
 
-        const response = await fetch(`${API_URL}/api/categorias/${id}`, {
+        const updated = await fetchJson(`${API_URL}/api/categorias/${id}`, {
             method: 'PUT',
             headers: { ...getAuthHeaders(), 'Content-Type': 'application/x-www-form-urlencoded' },
             body: params
         })
-        if (!response.ok) {
-            const err = await response.json().catch(() => null)
-            throw new Error(err?.mensaje || 'Error al actualizar la categoría.')
-        }
-        const updated = await response.json()
         setCategories(prev => prev.map(c => c.id === id ? updated : c))
         return updated
-    }
+    }, [getAuthHeaders])
 
-    const deleteCategory = async (id) => {
-        const response = await fetch(`${API_URL}/api/categorias/${id}`, {
+    const deleteCategory = useCallback(async (id) => {
+        await fetchJson(`${API_URL}/api/categorias/${id}`, {
             method: 'DELETE',
             headers: getAuthHeaders()
         })
-        if (!response.ok) {
-            const err = await response.json().catch(() => null)
-            throw new Error(err?.mensaje || 'Error al eliminar la categoría.')
-        }
         setCategories(prev => prev.filter(c => c.id !== id))
-    }
+    }, [getAuthHeaders])
 
-    const toggleCategoryFilter = (id) => {
+    const toggleCategoryFilter = useCallback((id) => {
         setSelectedCategoryIds(prev =>
             prev.includes(id) ? prev.filter(c => c !== id) : [...prev, id]
         )
-    }
+    }, [])
 
-    const clearCategoryFilters = () => {
+    const clearCategoryFilters = useCallback(() => {
         setSelectedCategoryIds([])
-    }
+    }, [])
 
     const fetchFeatures = useCallback(async () => {
         try {
             setFeaturesLoading(true)
-            const response = await fetch(`${API_URL}/api/caracteristicas`)
-            if (!response.ok) throw new Error('Error al cargar características.')
-            const data = await response.json()
+            const data = await fetchJson(`${API_URL}/api/caracteristicas`)
             setFeatures(data)
         } catch {
             console.warn('No se pudieron cargar las características.')
@@ -159,55 +150,43 @@ export const ProductProvider = ({ children }) => {
         }
     }, [])
 
-    const createFeature = async (nombre, icono) => {
+    const createFeature = useCallback(async (nombre, icono) => {
         const params = new URLSearchParams()
         params.append('nombre', nombre)
         params.append('icono', icono)
-        const response = await fetch(`${API_URL}/api/caracteristicas`, {
+
+        const created = await fetchJson(`${API_URL}/api/caracteristicas`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded', ...getAuthHeaders() },
             body: params
         })
-        if (!response.ok) {
-            const err = await response.json().catch(() => null)
-            throw new Error(err?.mensaje || 'Error al crear la característica.')
-        }
-        const created = await response.json()
         setFeatures(prev => [...prev, created])
         return created
-    }
+    }, [getAuthHeaders])
 
-    const updateFeature = async (id, nombre, icono) => {
+    const updateFeature = useCallback(async (id, nombre, icono) => {
         const params = new URLSearchParams()
         if (nombre) params.append('nombre', nombre)
         if (icono) params.append('icono', icono)
-        const response = await fetch(`${API_URL}/api/caracteristicas/${id}`, {
+
+        const updated = await fetchJson(`${API_URL}/api/caracteristicas/${id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded', ...getAuthHeaders() },
             body: params
         })
-        if (!response.ok) {
-            const err = await response.json().catch(() => null)
-            throw new Error(err?.mensaje || 'Error al actualizar la característica.')
-        }
-        const updated = await response.json()
         setFeatures(prev => prev.map(f => f.id === id ? updated : f))
         return updated
-    }
+    }, [getAuthHeaders])
 
-    const deleteFeature = async (id) => {
-        const response = await fetch(`${API_URL}/api/caracteristicas/${id}`, {
+    const deleteFeature = useCallback(async (id) => {
+        await fetchJson(`${API_URL}/api/caracteristicas/${id}`, {
             method: 'DELETE',
             headers: getAuthHeaders()
         })
-        if (!response.ok) {
-            const err = await response.json().catch(() => null)
-            throw new Error(err?.mensaje || 'Error al eliminar la característica.')
-        }
         setFeatures(prev => prev.filter(f => f.id !== id))
-    }
+    }, [getAuthHeaders])
 
-    const deleteProduct = async (id) => {
+    const deleteProduct = useCallback(async (id) => {
         if (typeof id === 'string' && id.startsWith('api-')) {
             try {
                 const numericId = id.replace('api-', '')
@@ -225,9 +204,26 @@ export const ProductProvider = ({ children }) => {
         }
 
         setProducts(prevProducts => prevProducts.filter(p => p.id !== id))
-    }
+    }, [getAuthHeaders])
 
-    const updateProduct = async (id, { name, description, categoryId, imagenes, caracteristicas }) => {
+    const fetchAvailability = useCallback(async (productId, desde, hasta) => {
+        try {
+            const response = await fetch(`${API_URL}/api/reservas/producto/${productId}/disponibilidad?desde=${desde}&hasta=${hasta}`)
+            if (!response.ok) throw new Error('Error al cargar disponibilidad')
+            return await response.json()
+        } catch {
+            console.warn('No se pudo cargar disponibilidad')
+            return { fechasOcupadas: [], fechasDisponibles: [] }
+        }
+    }, [])
+
+    const fetchProductById = useCallback(async (id) => {
+        const numericId = String(id).replace(/^api-/, '')
+        const product = await fetchJson(`${API_URL}/api/productos/${numericId}`)
+        return mapApiProductToCard(product)
+    }, [])
+
+    const updateProduct = useCallback(async (id, { name, description, categoryId, imagenes, caracteristicas }) => {
         const data = new FormData()
         if (name) data.append('nombre', name)
         if (description) data.append('descripcion', description)
@@ -240,24 +236,18 @@ export const ProductProvider = ({ children }) => {
         }
 
         const numericId = typeof id === 'string' && id.startsWith('api-') ? id.replace('api-', '') : id
-        const response = await fetch(`${API_URL}/api/productos/${numericId}`, {
+        const updatedProduct = await fetchJson(`${API_URL}/api/productos/${numericId}`, {
             method: 'PUT',
             headers: getAuthHeaders(),
             body: data
         })
 
-        if (!response.ok) {
-            const errorData = await response.json().catch(() => null)
-            throw new Error(errorData?.mensaje || 'No se pudo actualizar el producto.')
-        }
-
-        const updatedProduct = await response.json()
         const mappedProduct = mapApiProductToCard(updatedProduct)
         setProducts(prevProducts => prevProducts.map(p => String(p.id) === String(id) ? mappedProduct : p))
         return mappedProduct
-    }
+    }, [getAuthHeaders])
 
-    const addProduct = async ({ name, description, categoryId, images, caracteristicas }) => {
+    const addProduct = useCallback(async ({ name, description, categoryId, images, caracteristicas }) => {
         const data = new FormData()
         data.append('nombre', name)
         data.append('descripcion', description)
@@ -271,30 +261,71 @@ export const ProductProvider = ({ children }) => {
             caracteristicas.forEach(c => data.append('caracteristicas', c))
         }
 
-        const response = await fetch(`${API_URL}/api/productos`, {
+        const createdProduct = await fetchJson(`${API_URL}/api/productos`, {
             method: 'POST',
             headers: getAuthHeaders(),
             body: data
         })
 
-        if (!response.ok) {
-            const errorData = await response.json().catch(() => null)
-            throw new Error(errorData?.mensaje || 'No se pudo guardar el producto.')
-        }
-
-        const createdProduct = await response.json()
         const mappedProduct = mapApiProductToCard(createdProduct)
         setProducts(prevProducts => [...prevProducts, mappedProduct])
         return mappedProduct
-    }
+    }, [getAuthHeaders])
+
+    const contextValue = useMemo(() => ({
+        products,
+        addProduct,
+        updateProduct,
+        deleteProduct,
+        loading,
+        apiError,
+        features,
+        featuresLoading,
+        fetchFeatures,
+        createFeature,
+        updateFeature,
+        deleteFeature,
+        categories,
+        categoriesLoading,
+        fetchCategories,
+        createCategory,
+        updateCategory,
+        deleteCategory,
+        selectedCategoryIds,
+        toggleCategoryFilter,
+        clearCategoryFilters,
+        fetchProducts: doFetchProducts,
+        fetchAvailability,
+        fetchProductById
+    }), [
+        products,
+        addProduct,
+        updateProduct,
+        deleteProduct,
+        loading,
+        apiError,
+        features,
+        featuresLoading,
+        fetchFeatures,
+        createFeature,
+        updateFeature,
+        deleteFeature,
+        categories,
+        categoriesLoading,
+        fetchCategories,
+        createCategory,
+        updateCategory,
+        deleteCategory,
+        selectedCategoryIds,
+        toggleCategoryFilter,
+        clearCategoryFilters,
+        doFetchProducts,
+        fetchAvailability,
+        fetchProductById
+    ])
 
     return (
-        <ProductContext.Provider value={{
-            products, addProduct, updateProduct, deleteProduct, loading, apiError,
-            features, featuresLoading, fetchFeatures, createFeature, updateFeature, deleteFeature,
-            categories, categoriesLoading, fetchCategories, createCategory, updateCategory, deleteCategory,
-            selectedCategoryIds, toggleCategoryFilter, clearCategoryFilters
-        }}>
+        <ProductContext.Provider value={contextValue}>
             {children}
         </ProductContext.Provider>
     )

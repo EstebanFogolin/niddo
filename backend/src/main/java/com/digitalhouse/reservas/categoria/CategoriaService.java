@@ -1,10 +1,12 @@
 package com.digitalhouse.reservas.categoria;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@Transactional
 public class CategoriaService {
 
     private final CategoriaRepository categoriaRepository;

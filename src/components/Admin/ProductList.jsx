@@ -1,10 +1,12 @@
 import { useContext, useState } from 'react'
 import { ProductContext } from '../../context/ProductContext'
+import { AuthContext } from '../../context/AuthContext'
 import EditProductForm from './EditProductForm'
 import './ProductList.css'
 
 const ProductList = () => {
   const { products, deleteProduct } = useContext(ProductContext)
+  const { isAdmin } = useContext(AuthContext)
   const [confirmId, setConfirmId] = useState(null)
   const [editProduct, setEditProduct] = useState(null)
 
@@ -30,7 +32,7 @@ const ProductList = () => {
               <th>Id</th>
               <th>Nombre</th>
               <th>Categoría</th>
-              <th>Acciones</th>
+              {isAdmin && <th>Acciones</th>}
             </tr>
           </thead>
           <tbody>
@@ -39,24 +41,26 @@ const ProductList = () => {
                 <td>{product.id}</td>
                 <td>{product.title}</td>
                 <td>{product.category}</td>
-                <td>
-                  <div className="action-buttons">
-                    <button className="edit-btn" onClick={() => setEditProduct(product)}>
-                      Editar
-                    </button>
-                    {confirmId === product.id ? (
-                      <div className="confirm-actions">
-                        <button className="confirm-yes" onClick={() => handleDelete(product.id)}>Sí</button>
-                        <button className="confirm-no" onClick={() => setConfirmId(null)}>No</button>
-                      </div>
-                    ) : (
-                      <button className="delete-btn" onClick={() => setConfirmId(product.id)}>
-                        Eliminar
+                {isAdmin && (
+                  <td>
+                    <div className="action-buttons">
+                      <button className="edit-btn" onClick={() => setEditProduct(product)}>
+                        Editar
                       </button>
-                    )}
-                    {confirmId === product.id && <span className="confirm-text">¿Eliminar?</span>}
-                  </div>
-                </td>
+                      {confirmId === product.id ? (
+                        <div className="confirm-actions">
+                          <button className="confirm-yes" onClick={() => handleDelete(product.id)}>Sí</button>
+                          <button className="confirm-no" onClick={() => setConfirmId(null)}>No</button>
+                        </div>
+                      ) : (
+                        <button className="delete-btn" onClick={() => setConfirmId(product.id)}>
+                          Eliminar
+                        </button>
+                      )}
+                      {confirmId === product.id && <span className="confirm-text">¿Eliminar?</span>}
+                    </div>
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>
