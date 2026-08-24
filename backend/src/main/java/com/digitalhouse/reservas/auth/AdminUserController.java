@@ -22,7 +22,10 @@ public class AdminUserController {
 
     @GetMapping
     public List<UsuarioResponse> listar() {
-        return adminUserService.listar();
+        System.out.println("[AdminUserController] listar called");
+        List<UsuarioResponse> result = adminUserService.listar();
+        System.out.println("[AdminUserController] Found " + result.size() + " users");
+        return result;
     }
 
     @PutMapping("/{id}/role")

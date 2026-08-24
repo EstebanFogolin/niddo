@@ -1,8 +1,7 @@
 import { useState, useEffect, useContext, useCallback } from 'react'
 import { AuthContext } from '../../context/AuthContext'
+import { API_URL } from '../../config/api.js'
 import './ProductList.css'
-
-const API_URL = 'http://localhost:8080'
 
 const UserManagement = () => {
 
@@ -19,12 +18,16 @@ const UserManagement = () => {
             const response = await fetch(`${API_URL}/api/admin/usuarios`, { headers: getAuthHeaders() })
 
             if (!response.ok) {
+                if (response.status === 403) {
+                    throw new Error('Acceso denegado: necesitás rol ADMIN. Promové tu usuario vía H2 console: UPDATE USUARIO SET ROLE=\'ADMIN\' WHERE email=\'tu@mail\';')
+                }
                 const apiError = await response.json().catch(() => null)
-                throw new Error(apiError?.mensaje || 'No se pudieron cargar los usuarios.')
+                throw new Error(apiError?.mensaje || `No se pudieron cargar los usuarios. (HTTP ${response.status})`)
             }
 
             setUsers(await response.json())
         } catch (err) {
+            console.error('[UserManagement] fetchUsers failed:', err)
             setError(err.message)
         } finally {
             setLoading(false)
@@ -44,11 +47,17 @@ const UserManagement = () => {
                 headers
             })
 
-            if (!response.ok) throw new Error('No se pudo cambiar el rol.')
+            if (!response.ok) {
+                if (response.status === 403) throw new Error('Acceso denegado: necesitás rol ADMIN.')
+                const body = await response.text().catch(() => '')
+                console.error('[UserManagement] toggleRole failed:', response.status, body)
+                throw new Error('No se pudo cambiar el rol.')
+            }
 
             const updated = await response.json()
             setUsers(prev => prev.map(u => u.id === updated.id ? updated : u))
         } catch (err) {
+            console.error('[UserManagement] toggleRole error:', err)
             alert(err.message)
         } finally {
             setChangingId(null)

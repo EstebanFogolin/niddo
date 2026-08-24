@@ -10,16 +10,24 @@ const SearchBlock = () => {
     const [debouncedQuery, setDebouncedQuery] = useState('')
     const [fechaDesde, setFechaDesde] = useState('')
     const [fechaHasta, setFechaHasta] = useState('')
-    const [suggestions, setSuggestions] = useState([])
-    const [showSuggestions, setShowSuggestions] = useState(false)
     const [isSearching, setIsSearching] = useState(false)
+    const [showSuggestions, setShowSuggestions] = useState(false)
     const inputRef = useRef(null)
     const debounceRef = useRef(null)
 
+    // Sugerencias derivadas (sin estado propio, sin efectos)
     const allProductNames = useMemo(
         () => products.map(p => p.title).filter(Boolean),
         [products]
     )
+
+    const suggestions = useMemo(() => {
+        if (!debouncedQuery) return []
+        const q = debouncedQuery.toLowerCase()
+        return allProductNames
+            .filter(name => name.toLowerCase().includes(q))
+            .slice(0, 5)
+    }, [debouncedQuery, allProductNames])
 
     useEffect(() => {
         if (debounceRef.current) clearTimeout(debounceRef.current)
@@ -29,19 +37,10 @@ const SearchBlock = () => {
         return () => { if (debounceRef.current) clearTimeout(debounceRef.current) }
     }, [query])
 
+    // Fetch: solo cuando cambia debouncedQuery o selectedCategoryIds
     useEffect(() => {
-        if (!debouncedQuery) {
-            fetchProducts(selectedCategoryIds)
-        } else {
-            const q = debouncedQuery.toLowerCase()
-            const filtered = allProductNames
-                .filter(name => name.toLowerCase().includes(q))
-                .slice(0, 5)
-            setSuggestions(filtered) // eslint-disable-line react-hooks/set-state-in-effect
-            setShowSuggestions(filtered.length > 0)
-            fetchProducts(selectedCategoryIds, debouncedQuery)
-        }
-    }, [debouncedQuery, selectedCategoryIds, fetchProducts, allProductNames])
+        fetchProducts(selectedCategoryIds, debouncedQuery)
+    }, [debouncedQuery, selectedCategoryIds, fetchProducts])
 
     const handleSuggestionClick = useCallback((name) => {
         setQuery(name)

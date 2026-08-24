@@ -2,9 +2,8 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Header } from '../Header/Header'
 import { Footer } from '../Footer/Footer'
+import { API_URL } from '../../config/api.js'
 import './RegisterPage.css'
-
-const API_URL = 'http://localhost:8080'
 
 const RegisterPage = () => {
 

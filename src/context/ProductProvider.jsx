@@ -1,14 +1,7 @@
 import { useEffect, useState, useContext, useCallback, useMemo } from "react"
 import { ProductContext } from "./ProductContext"
 import { AuthContext } from "./AuthContext"
-
-const API_URL = 'http://localhost:8080'
-
-const resolveImageUrl = (path) => {
-    if (!path) return ''
-    if (path.startsWith('http://') || path.startsWith('https://')) return path
-    return `${API_URL}${path}`
-}
+import { API_URL, resolveImageUrl } from "../config/api.js"
 
 const mapApiProductToCard = (product) => {
     const cat = product.categoria

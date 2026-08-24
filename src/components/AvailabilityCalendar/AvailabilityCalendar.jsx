@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
+import { API_URL } from '../../config/api.js'
 import './AvailabilityCalendar.css'
 
 const AvailabilityCalendar = ({ productId, initialDesde, initialHasta }) => {
@@ -26,7 +27,7 @@ const AvailabilityCalendar = ({ productId, initialDesde, initialHasta }) => {
             const desdeStr = hoy.toISOString().split('T')[0]
             const hastaStr = dentroDe6Meses.toISOString().split('T')[0]
 
-            const response = await fetch(`http://localhost:8080/api/reservas/producto/${productId}/disponibilidad?desde=${desdeStr}&hasta=${hastaStr}`)
+            const response = await fetch(`${API_URL}/api/reservas/producto/${productId}/disponibilidad?desde=${desdeStr}&hasta=${hastaStr}`)
             if (!response.ok) throw new Error('Error al cargar disponibilidad')
             const data = await response.json()
 

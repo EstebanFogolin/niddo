@@ -4,6 +4,7 @@ import { Header } from '../Header/Header'
 import { Footer } from '../Footer/Footer'
 import { AuthContext } from '../../context/AuthContext'
 import { useFavorites } from '../../context/FavoritesContext'
+import { API_URL, resolveImageUrl } from '../../config/api.js'
 import ProductCard from '../RecomendCards/ProductCard'
 import './FavoritesPage.css'
 
@@ -20,7 +21,7 @@ const FavoritesPage = () => {
             if (!isAuthenticated) return
             try {
                 setLoading(true)
-                const response = await fetch('http://localhost:8080/api/favoritos', { headers: getAuthHeaders() })
+                const response = await fetch(`${API_URL}/api/favoritos`, { headers: getAuthHeaders() })
                 if (!response.ok) {
                     const apiError = await response.json().catch(() => null)
                     throw new Error(apiError?.mensaje || 'Error al cargar favoritos')
@@ -34,11 +35,12 @@ const FavoritesPage = () => {
                     score: 8,
                     scoreLabel: 'Muy bueno',
                     distance: '0 km del centro',
-                    img: p.imagenes?.[0] ? `http://localhost:8080${p.imagenes[0]}` : '',
-                    images: p.imagenes?.map(img => `http://localhost:8080${img}`) || []
+                    img: resolveImageUrl(p.imagenes?.[0]),
+                    images: p.imagenes?.map(resolveImageUrl) || []
                 }))
                 setProducts(mapped)
-            } catch {
+            } catch (e) {
+                console.error('[FavoritesPage] fetch failed:', e)
                 setError('No se pudieron cargar tus favoritos')
             } finally {
                 setLoading(false)
@@ -104,7 +106,10 @@ const FavoritesPage = () => {
                                 scoreLabel={product.scoreLabel}
                                 distance={product.distance}
                                 img={product.img}
-                                onFavoriteToggle={() => toggleFavorite(product.id.replace('api-', ''))}
+                                onFavoriteToggle={async () => {
+                                    await toggleFavorite(Number(product.id.replace('api-', '')))
+                                    setProducts(prev => prev.filter(p => p.id !== product.id))
+                                }}
                                 isFavorite={true}
                                 showFavoriteButton={true}
                             />

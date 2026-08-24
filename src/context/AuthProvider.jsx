@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react"
 import { AuthContext } from "./AuthContext"
+import { API_URL } from "../config/api.js"
 
-const API_URL = 'http://localhost:8080'
 const STORAGE_KEY = 'niddo_auth'
 
 const loadUser = () => {

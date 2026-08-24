@@ -10,13 +10,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.List;
 
-@Component
 public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
@@ -31,6 +29,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws IOException, ServletException {
 
+        System.out.println("[JwtAuthFilter] Processing request: " + request.getMethod() + " " + request.getRequestURI());
+
         String header = request.getHeader("Authorization");
 
         if (header != null && header.startsWith("Bearer ")) {
@@ -38,7 +38,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
             if (jwtService.isValid(token)) {
                 String email = jwtService.extractEmail(token);
-                usuarioRepository.findByEmail(email).ifPresent(usuario -> {
+                var usuarioOpt = usuarioRepository.findByEmail(email);
+                if (usuarioOpt.isPresent()) {
+                    Usuario usuario = usuarioOpt.get();
                     List<SimpleGrantedAuthority> authorities = List.of(
                             new SimpleGrantedAuthority("ROLE_" + usuario.getRole())
                     );
@@ -47,8 +49,18 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                             new UsernamePasswordAuthenticationToken(usuario.getId(), null, authorities);
 
                     SecurityContextHolder.getContext().setAuthentication(auth);
-                });
+                    System.out.println("[JwtAuthFilter] Authenticated user: " + email + " (id=" + usuario.getId() + ")");
+                } else {
+                    System.out.println("[JwtAuthFilter] User not found for email: " + email);
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.getWriter().write("Usuario no encontrado");
+                    return;
+                }
+            } else {
+                System.out.println("[JwtAuthFilter] Invalid token");
             }
+        } else {
+            System.out.println("[JwtAuthFilter] No Bearer token found");
         }
 
         filterChain.doFilter(request, response);

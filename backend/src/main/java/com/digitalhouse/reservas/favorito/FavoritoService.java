@@ -50,10 +50,14 @@ public class FavoritoService {
     }
 
     public List<Producto> listarFavoritos(Long usuarioId) {
-        return favoritoRepository.findByUsuarioId(usuarioId)
-                .stream()
+        System.out.println("[FavoritoService] listarFavoritos called with usuarioId: " + usuarioId);
+        List<Favorito> favoritos = favoritoRepository.findByUsuarioIdWithProducto(usuarioId);
+        System.out.println("[FavoritoService] Found " + favoritos.size() + " favoritos");
+        List<Producto> productos = favoritos.stream()
                 .map(Favorito::getProducto)
                 .collect(Collectors.toList());
+        System.out.println("[FavoritoService] Mapped to " + productos.size() + " productos");
+        return productos;
     }
 
     public void remover(Long usuarioId, Long productoId) {

@@ -1,31 +1,29 @@
-import { useContext, useId, useMemo } from "react";
+import { useContext, useMemo } from "react";
 import ProductCard from "./ProductCard";
 import './Recommendations.css';
 import { ProductContext } from "../../context/ProductContext";
 
 const MAX_RECOMMENDATIONS = 10
 
-const hashProductId = (id, seed) => {
-    const value = `${seed}:${id}`
-    let hash = 0
-
-    for (let index = 0; index < value.length; index += 1) {
-        hash = ((hash << 5) - hash + value.charCodeAt(index)) | 0
+function fisherYatesShuffle(array) {
+    const shuffled = [...array]
+    for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
     }
-
-    return hash
+    return shuffled
 }
 
 const Recommendations = () => {
 
     const { products } = useContext(ProductContext)
-    const pageSeed = useId()
 
+    // Fisher-Yates en cada montaje: Math.random() genera orden distinto
+    // cada vez que HomePage se monta (navegar a "/" tras estar en detalle)
     const recommendedProducts = useMemo(() => {
-        return [...products]
-            .sort((first, second) => hashProductId(first.id, pageSeed) - hashProductId(second.id, pageSeed))
-            .slice(0, MAX_RECOMMENDATIONS)
-    }, [pageSeed, products])
+        if (products.length === 0) return []
+        return fisherYatesShuffle(products).slice(0, MAX_RECOMMENDATIONS)
+    }, [products])
 
     return (
         <section className="recommendations-section">

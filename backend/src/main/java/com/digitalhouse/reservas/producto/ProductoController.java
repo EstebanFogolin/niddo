@@ -41,12 +41,22 @@ public class ProductoController {
         return productoService.listar(categoriaIds);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/test-endpoint")
+    public String test() {
+        return "ProductoController test works";
+    }
+
+    @GetMapping(value = "/test-works", produces = "text/plain")
+    public String testWorks() {
+        return "Test works";
+    }
+
+    @GetMapping("/{id:\\d+}")
     public ProductoResponse obtener(@PathVariable Long id) {
         return productoService.obtenerPorId(id);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{id:\\d+}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void eliminar(@PathVariable Long id) {
         productoService.eliminar(id);
