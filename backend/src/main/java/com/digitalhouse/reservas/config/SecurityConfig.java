@@ -32,7 +32,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/productos", "/api/productos/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/caracteristicas", "/api/caracteristicas/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/categorias", "/api/categorias/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/reservas/producto/**/disponibilidad").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/reservas/producto/*/disponibilidad").permitAll()
                 .requestMatchers("/uploads/**").permitAll()
                 .requestMatchers("/api/favoritos/**").permitAll()
                 .requestMatchers("/public-test", "/test-image", "/test-controller").permitAll()
