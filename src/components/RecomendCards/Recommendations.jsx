@@ -45,6 +45,8 @@ const Recommendations = () => {
                             scoreLabel={product.scoreLabel}
                             distance={product.distance}
                             img={product.img}
+                            promedioPuntuacion={product.promedioPuntuacion}
+                            totalResenas={product.totalResenas}
                             showFavoriteButton
                         />
                     ))}

@@ -35,6 +35,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         if (header != null && header.startsWith("Bearer ")) {
             String token = header.substring(7);
+            System.out.println("[JwtAuthFilter] Token received (first 20 chars): " + token.substring(0, Math.min(20, token.length())) + "...");
 
             if (jwtService.isValid(token)) {
                 String email = jwtService.extractEmail(token);
@@ -53,11 +54,16 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 } else {
                     System.out.println("[JwtAuthFilter] User not found for email: " + email);
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                    response.getWriter().write("Usuario no encontrado");
+                    response.setContentType("application/json");
+                    response.getWriter().write("{\"mensaje\":\"Usuario no encontrado\"}");
                     return;
                 }
             } else {
-                System.out.println("[JwtAuthFilter] Invalid token");
+                System.out.println("[JwtAuthFilter] Invalid token - validation failed");
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setContentType("application/json");
+                response.getWriter().write("{\"mensaje\":\"Token inválido o expirado\"}");
+                return;
             }
         } else {
             System.out.println("[JwtAuthFilter] No Bearer token found");

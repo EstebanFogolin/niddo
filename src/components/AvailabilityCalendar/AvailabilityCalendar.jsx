@@ -1,8 +1,11 @@
 import { useState, useEffect, useCallback } from 'react'
-import { API_URL } from '../../config/api.js'
+import { useContext } from 'react'
+import { AuthContext } from '../../context/AuthContext'
+import { API_URL, reservasApi } from '../../config/api.js'
 import './AvailabilityCalendar.css'
 
 const AvailabilityCalendar = ({ productId, initialDesde, initialHasta }) => {
+    const { isAuthenticated, token, login } = useContext(AuthContext)
     const [fechasOcupadas, setFechasOcupadas] = useState(new Set())
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState('')
@@ -15,6 +18,9 @@ const AvailabilityCalendar = ({ productId, initialDesde, initialHasta }) => {
 
     const [desde, setDesde] = useState(initialDesde || '')
     const [hasta, setHasta] = useState(initialHasta || '')
+    const [reservando, setReservando] = useState(false)
+    const [reservaError, setReservaError] = useState('')
+    const [reservaExitosa, setReservaExitosa] = useState(false)
 
     const fetchDisponibilidad = useCallback(async () => {
         if (!productId) return
@@ -120,11 +126,37 @@ const AvailabilityCalendar = ({ productId, initialDesde, initialHasta }) => {
         } else {
             setHasta(fechaStr)
         }
+        setReservaError('')
+        setReservaExitosa(false)
     }, [desde, hasta, fechasOcupadas])
 
     const handleReintentar = () => {
         setError('')
         fetchDisponibilidad()
+    }
+
+    const handleReservar = async () => {
+        if (!desde || !hasta) return
+        if (!isAuthenticated) {
+            login(`/productos/${productId}`)
+            return
+        }
+
+        setReservando(true)
+        setReservaError('')
+
+        try {
+            await reservasApi.crear({ productoId: Number(productId), fechaInicio: desde, fechaFin: hasta }, token)
+            setReservaExitosa(true)
+            setReservaError('')
+            fetchDisponibilidad()
+            setDesde('')
+            setHasta('')
+        } catch (err) {
+            setReservaError(err.message || 'Error al crear la reserva')
+        } finally {
+            setReservando(false)
+        }
     }
 
     if (loading) {
@@ -134,6 +166,8 @@ const AvailabilityCalendar = ({ productId, initialDesde, initialHasta }) => {
             </div>
         )
     }
+
+    const rangoCompleto = desde && hasta
 
     return (
         <section className="availability-calendar">
@@ -157,6 +191,43 @@ const AvailabilityCalendar = ({ productId, initialDesde, initialHasta }) => {
                     {desde && <span>Check-in: {desde}</span>}
                     {hasta && <span>Check-out: {hasta}</span>}
                     {!hasta && desde && <span className="esperando">Seleccione fecha de salida</span>}
+                </div>
+            )}
+
+            {reservaExitosa && (
+                <div className="reserva-exitosa" role="status">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                    <span>¡Reserva creada correctamente!</span>
+                </div>
+            )}
+
+            {rangoCompleto && (
+                <button
+                    className="btn-reservar"
+                    onClick={handleReservar}
+                    disabled={reservando}
+                    type="button"
+                >
+                    {reservando ? (
+                        <>
+                            <svg className="spinner" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                                <circle cx="12" cy="12" r="10" strokeOpacity="0.25"></circle>
+                                <path d="M12 2v10" strokeLinecap="round"></path>
+                            </svg>
+                            Procesando...
+                        </>
+                    ) : (
+                        'Reservar'
+                    )}
+                </button>
+            )}
+
+            {reservaError && (
+                <div className="reserva-error" role="alert">
+                    {reservaError}
                 </div>
             )}
         </section>

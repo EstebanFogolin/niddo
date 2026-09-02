@@ -31,12 +31,14 @@ const FavoritesPage = () => {
                     id: `api-${p.id}`,
                     title: p.nombre,
                     category: p.categoria?.titulo || 'Hotel',
-                    stars: 5,
-                    score: 8,
-                    scoreLabel: 'Muy bueno',
+                    stars: p.promedioPuntuacion ? Math.floor(p.promedioPuntuacion) : 5,
+                    score: p.promedioPuntuacion ? Math.round(p.promedioPuntuacion * 10) : 8,
+                    scoreLabel: p.totalResenas ? `${p.totalResenas} reseñas` : 'Muy bueno',
                     distance: '0 km del centro',
                     img: resolveImageUrl(p.imagenes?.[0]),
-                    images: p.imagenes?.map(resolveImageUrl) || []
+                    images: p.imagenes?.map(resolveImageUrl) || [],
+                    promedioPuntuacion: p.promedioPuntuacion || 0,
+                    totalResenas: p.totalResenas || 0
                 }))
                 setProducts(mapped)
             } catch (e) {

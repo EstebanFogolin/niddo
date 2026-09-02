@@ -1,5 +1,6 @@
 package com.digitalhouse.reservas.producto;
 
+import com.digitalhouse.reservas.resena.Resena;
 import java.util.List;
 import java.util.Map;
 
@@ -9,7 +10,10 @@ public record ProductoResponse(
         String descripcion,
         Map<String, Object> categoria,
         List<String> imagenes,
-        List<Map<String, Object>> caracteristicas
+        List<Map<String, Object>> caracteristicas,
+        Double promedioPuntuacion,
+        Long totalResenas,
+        Integer[] distribucionEstrellas
 ) {
     public static ProductoResponse fromEntity(Producto producto) {
         List<Map<String, Object>> caracs = producto.getCaracteristicas()
@@ -30,13 +34,30 @@ public record ProductoResponse(
                 )
                 : null;
 
+        Double promedio = producto.getResenas() != null && !producto.getResenas().isEmpty()
+                ? producto.getResenas().stream().mapToInt(Resena::getPuntuacion).average().orElse(0.0)
+                : 0.0;
+        Long total = producto.getResenas() != null ? (long) producto.getResenas().size() : 0L;
+        Integer[] distribucion = new Integer[]{0, 0, 0, 0, 0};
+        if (producto.getResenas() != null) {
+            for (Resena r : producto.getResenas()) {
+                int idx = r.getPuntuacion() - 1;
+                if (idx >= 0 && idx < 5) {
+                    distribucion[idx]++;
+                }
+            }
+        }
+
         return new ProductoResponse(
                 producto.getId(),
                 producto.getNombre(),
                 producto.getDescripcion(),
                 cat,
                 producto.getImagenes(),
-                caracs
+                caracs,
+                promedio,
+                total,
+                distribucion
         );
     }
 }

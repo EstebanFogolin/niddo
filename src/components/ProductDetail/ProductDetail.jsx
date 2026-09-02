@@ -5,6 +5,10 @@ import { Footer } from '../Footer/Footer'
 import { ProductContext } from '../../context/ProductContext'
 import AvailabilityCalendar from '../AvailabilityCalendar/AvailabilityCalendar'
 import ProductPolicies from '../ProductPolicies/ProductPolicies'
+import ShareModal from '../ShareModal/ShareModal'
+import RatingSummary from '../Reviews/RatingSummary'
+import ReviewList from '../Reviews/ReviewList'
+import ReviewForm from '../Reviews/ReviewForm'
 import './ProductDetail.css'
 
 const ProductDetail = () => {
@@ -12,8 +16,12 @@ const ProductDetail = () => {
     const navigate = useNavigate()
     const { products, fetchProductById } = useContext(ProductContext)
     const [isGalleryOpen, setIsGalleryOpen] = useState(false)
+    const [isShareOpen, setIsShareOpen] = useState(false)
     const [remoteProduct, setRemoteProduct] = useState(null)
     const [failedProductId, setFailedProductId] = useState(null)
+    const [reviews, setReviews] = useState([])
+    const [totalReviews, setTotalReviews] = useState(0)
+    const [editingReview, setEditingReview] = useState(null)
 
     const productFromList = products.find((item) => String(item.id) === id)
     const product = productFromList || (String(remoteProduct?.id) === id ? remoteProduct : null)
@@ -45,6 +53,27 @@ const ProductDetail = () => {
 
     const numericId = product?.id?.replace?.('api-', '') || id.replace('api-', '')
 
+    const handleReviewSaved = (savedReview) => {
+        if (savedReview) {
+            setReviews((prev) => {
+                const existing = prev.findIndex((r) => r.id === savedReview.id)
+                if (existing >= 0) {
+                    return prev.map((r, i) => (i === existing ? savedReview : r))
+                }
+                return [savedReview, ...prev]
+            })
+            setTotalReviews((prev) => prev + 1)
+        }
+        setEditingReview(null)
+    }
+
+    // Scroll to top when product loads
+    useEffect(() => {
+        if (product) {
+            window.scrollTo(0, 0)
+        }
+    }, [product])
+
     if (!product) {
         return (
             <>
@@ -69,9 +98,23 @@ const ProductDetail = () => {
                         <span className="product-detail-category">{product.category}</span>
                         <h1>{product.title}</h1>
                     </div>
-                    <button className="product-detail-back" onClick={() => window.history.length > 1 ? navigate(-1) : navigate('/')} aria-label="Volver atras">
-                        ←
-                    </button>
+                    <div className="product-detail-actions">
+                        <button
+                            className="product-detail-share"
+                            onClick={() => setIsShareOpen(true)}
+                            aria-label="Compartir producto"
+                            type="button"
+                        >
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                                <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+                                <polyline points="16 6 12 2 8 6"></polyline>
+                                <line x1="12" y1="2" x2="12" y2="15"></line>
+                            </svg>
+                        </button>
+                        <button className="product-detail-back" onClick={() => window.history.length > 1 ? navigate(-1) : navigate('/')} aria-label="Volver atras">
+                            ←
+                        </button>
+                    </div>
                 </header>
 
                 <section className="product-detail-body">
@@ -92,6 +135,25 @@ const ProductDetail = () => {
                     </div>
 
                     <p className="product-detail-description">{product.description}</p>
+
+                    <section className="product-detail-reviews" aria-labelledby="reviews-heading">
+                        <h2 id="reviews-heading" className="product-detail-reviews__title">Valoraciones y reseñas</h2>
+                        <RatingSummary
+                            promedio={product.promedioPuntuacion || 0}
+                            total={product.totalResenas || 0}
+                            distribucion={product.distribucionEstrellas || [0, 0, 0, 0, 0]}
+                        />
+                        <ReviewList
+                            productoId={numericId}
+                            initialReviews={reviews}
+                            initialTotal={totalReviews}
+                        />
+                        <ReviewForm
+                            productoId={numericId}
+                            onReviewCreated={handleReviewSaved}
+                            existingReview={editingReview}
+                        />
+                    </section>
 
                     {product.caracteristicas && product.caracteristicas.length > 0 && (
                         <section className="product-detail-features">
@@ -133,6 +195,15 @@ const ProductDetail = () => {
                     </div>
                 </div>
             )}
+
+            <ShareModal
+                isOpen={isShareOpen}
+                onClose={() => setIsShareOpen(false)}
+                title={product.title}
+                description={product.description}
+                image={product.img}
+                url={`${window.location.origin}/productos/${numericId}`}
+            />
         </>
     )
 }

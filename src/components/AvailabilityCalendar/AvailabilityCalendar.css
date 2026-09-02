@@ -194,6 +194,87 @@
     color: #666;
 }
 
+.rango-seleccionado + .btn-reservar,
+.rango-seleccionado ~ .reserva-exitosa + .btn-reservar,
+.rango-seleccionado ~ .reserva-error + .btn-reservar {
+    margin-top: 16px;
+}
+
+.btn-reservar {
+    width: 100%;
+    padding: 14px 24px;
+    background: linear-gradient(135deg, #e8b923 0%, #f0c83a 100%);
+    color: #1a1a2e;
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 4px 12px rgba(232, 185, 35, 0.3);
+}
+
+.btn-reservar:hover:not(:disabled) {
+    background: linear-gradient(135deg, #f0c83a 0%, #f4d45a 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(232, 185, 35, 0.4);
+}
+
+.btn-reservar:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-reservar .spinner {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.reserva-exitosa {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 16px;
+    padding: 14px 20px;
+    background: #e8f5e9;
+    border: 1px solid #c8e6c9;
+    border-radius: 10px;
+    color: #2e7d32;
+    font-weight: 600;
+    font-size: 14px;
+    animation: fadeIn 0.3s ease;
+}
+
+.reserva-error {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 16px;
+    padding: 14px 20px;
+    background: #fdecea;
+    border: 1px solid #f5c6cb;
+    border-radius: 10px;
+    color: #721c24;
+    font-weight: 500;
+    font-size: 14px;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
 @media (max-width: 767px) {
     .calendario-grid {
         gap: 2px;

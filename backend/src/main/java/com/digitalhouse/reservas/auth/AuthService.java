@@ -88,4 +88,31 @@ public class AuthService {
     private String normalizarEmail(String email) {
         return email.trim().toLowerCase(Locale.ROOT);
     }
+
+    public Long getUsuarioIdFromPrincipal(java.security.Principal principal) {
+        String name = principal.getName();
+        try {
+            return Long.parseLong(name);
+        } catch (NumberFormatException e) {
+            String email = name;
+            Usuario usuario = usuarioRepository.findByEmail(email)
+                    .orElseThrow(() -> new java.util.NoSuchElementException("Usuario no encontrado."));
+            return usuario.getId();
+        }
+    }
+
+    public boolean isAdmin(java.security.Principal principal) {
+        String name = principal.getName();
+        Long usuarioId;
+        try {
+            usuarioId = Long.parseLong(name);
+        } catch (NumberFormatException e) {
+            Usuario usuario = usuarioRepository.findByEmail(name)
+                    .orElseThrow(() -> new java.util.NoSuchElementException("Usuario no encontrado."));
+            usuarioId = usuario.getId();
+        }
+        return usuarioRepository.findById(usuarioId)
+                .map(u -> "ADMIN".equals(u.getRole()))
+                .orElse(false);
+    }
 }

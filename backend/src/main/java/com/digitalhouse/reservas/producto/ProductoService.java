@@ -4,6 +4,7 @@ import com.digitalhouse.reservas.caracteristica.Caracteristica;
 import com.digitalhouse.reservas.caracteristica.CaracteristicaRepository;
 import com.digitalhouse.reservas.categoria.Categoria;
 import com.digitalhouse.reservas.categoria.CategoriaRepository;
+import com.digitalhouse.reservas.resena.ResenaRepository;
 import com.digitalhouse.reservas.shared.NombreProductoDuplicadoException;
 import com.digitalhouse.reservas.shared.StorageException;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,26 +27,29 @@ public class ProductoService {
     private final ProductoRepository productoRepository;
     private final CaracteristicaRepository caracteristicaRepository;
     private final CategoriaRepository categoriaRepository;
+    private final ResenaRepository resenaRepository;
     private final Path uploadPath;
 
     public ProductoService(
             ProductoRepository productoRepository,
             CaracteristicaRepository caracteristicaRepository,
             CategoriaRepository categoriaRepository,
+            ResenaRepository resenaRepository,
             @Value("${app.upload-dir}") String uploadDir
     ) {
         this.productoRepository = productoRepository;
         this.caracteristicaRepository = caracteristicaRepository;
         this.categoriaRepository = categoriaRepository;
+        this.resenaRepository = resenaRepository;
         this.uploadPath = Path.of(uploadDir).toAbsolutePath().normalize();
     }
 
     public List<ProductoResponse> listar(List<Long> categoriaIds) {
         List<Producto> productos;
         if (categoriaIds != null && !categoriaIds.isEmpty()) {
-            productos = productoRepository.findByCategoriaIdIn(categoriaIds);
+            productos = productoRepository.findByCategoriaIdInWithResenas(categoriaIds);
         } else {
-            productos = productoRepository.findAll();
+            productos = productoRepository.findAllWithResenas();
         }
         return productos.stream()
                 .map(ProductoResponse::fromEntity)
@@ -57,14 +61,14 @@ public class ProductoService {
             return listar(null);
         }
         String query = q.trim();
-        return productoRepository.findByNombreContainingIgnoreCaseOrDescripcionContainingIgnoreCase(query, query)
+        return productoRepository.findByNombreContainingIgnoreCaseOrDescripcionContainingIgnoreCaseWithResenas(query)
                 .stream()
                 .map(ProductoResponse::fromEntity)
                 .toList();
     }
 
     public ProductoResponse obtenerPorId(Long id) {
-        Producto producto = productoRepository.findById(id)
+        Producto producto = productoRepository.findByIdWithResenas(id)
                 .orElseThrow(() -> new java.util.NoSuchElementException("Producto no encontrado."));
         return ProductoResponse.fromEntity(producto);
     }

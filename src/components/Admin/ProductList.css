@@ -68,22 +68,6 @@
   background: #e09510;
 }
 
-.confirm-text {
-  font-size: 13px;
-  color: #333;
-}
-
-.delete-btn {
-  background: #dc3545;
-  color: white;
-  border: none;
-  padding: 6px 14px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 13px;
-  transition: background 0.2s;
-}
-
 .delete-btn:hover {
   background: #c82333;
 }
@@ -107,30 +91,4 @@
   color: #383d41;
 }
 
-.confirm-actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 13px;
-  color: #333;
-}
 
-.confirm-yes {
-  background: #dc3545;
-  color: white;
-  border: none;
-  padding: 4px 12px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 13px;
-}
-
-.confirm-no {
-  background: #6c757d;
-  color: white;
-  border: none;
-  padding: 4px 12px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 13px;
-}

@@ -4,6 +4,7 @@ import com.digitalhouse.reservas.caracteristica.Caracteristica;
 import com.digitalhouse.reservas.categoria.Categoria;
 import com.digitalhouse.reservas.reserva.Reserva;
 import com.digitalhouse.reservas.favorito.Favorito;
+import com.digitalhouse.reservas.resena.Resena;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -59,6 +60,9 @@ public class Producto {
     @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Favorito> favoritos = new ArrayList<>();
 
+    @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Resena> resenas = new ArrayList<>();
+
     public Producto() {
     }
 
@@ -92,4 +96,7 @@ public class Producto {
 
     public List<Favorito> getFavoritos() { return favoritos; }
     public void setFavoritos(List<Favorito> favoritos) { this.favoritos = favoritos; }
+
+    public List<Resena> getResenas() { return resenas; }
+    public void setResenas(List<Resena> resenas) { this.resenas = resenas; }
 }

@@ -43,14 +43,14 @@ public class ReservaController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Reserva crear(
+    public ReservaResponse crear(
             @AuthenticationPrincipal Long usuarioId,
             @RequestBody CrearReservaRequest request
     ) {
         Reserva reserva = reservaService.crear(usuarioId, request.getProductoId(),
                 LocalDate.parse(request.getFechaInicio(), DateTimeFormatter.ISO_DATE),
                 LocalDate.parse(request.getFechaFin(), DateTimeFormatter.ISO_DATE));
-        return reserva;
+        return ReservaResponse.fromEntity(reserva);
     }
 
     @DeleteMapping("/{id}")
@@ -63,8 +63,10 @@ public class ReservaController {
     }
 
     @GetMapping("/mis-reservas")
-    public List<Reserva> misReservas(@AuthenticationPrincipal Long usuarioId) {
-        return reservaService.listarPorUsuario(usuarioId);
+    public List<ReservaResponse> misReservas(@AuthenticationPrincipal Long usuarioId) {
+        return reservaService.listarPorUsuario(usuarioId).stream()
+                .map(ReservaResponse::fromEntity)
+                .toList();
     }
 
     public static class CrearReservaRequest {

@@ -1,13 +1,15 @@
 import { useContext, useEffect, useState } from 'react'
 import { ProductContext } from '../../context/ProductContext'
 import CategoryForm from './CategoryForm'
+import DeleteCategoryModal from './DeleteCategoryModal'
 import './ProductList.css'
 
 const CategoriesManager = () => {
     const { categories, categoriesLoading, fetchCategories, deleteCategory } = useContext(ProductContext)
     const [showForm, setShowForm] = useState(false)
     const [editingCategory, setEditingCategory] = useState(null)
-    const [confirmId, setConfirmId] = useState(null)
+    const [categoryToDelete, setCategoryToDelete] = useState(null)
+    const [deleting, setDeleting] = useState(false)
 
     useEffect(() => {
         fetchCategories()
@@ -18,13 +20,25 @@ const CategoriesManager = () => {
         setShowForm(true)
     }
 
-    const handleDelete = async (id) => {
+    const handleDeleteClick = (cat) => {
+        setCategoryToDelete(cat)
+    }
+
+    const handleConfirmDelete = async () => {
+        if (!categoryToDelete) return
+        setDeleting(true)
         try {
-            await deleteCategory(id)
-            setConfirmId(null)
+            await deleteCategory(categoryToDelete.id)
         } catch (err) {
             alert(err.message)
+        } finally {
+            setDeleting(false)
+            setCategoryToDelete(null)
         }
+    }
+
+    const handleCloseDeleteModal = () => {
+        setCategoryToDelete(null)
     }
 
     if (categoriesLoading && categories.length === 0) {
@@ -60,18 +74,10 @@ const CategoriesManager = () => {
                                 <td><strong>{cat.titulo}</strong></td>
                                 <td style={{ fontSize: 13, color: '#666' }}>{cat.descripcion}</td>
                                 <td>
-                                    {confirmId === cat.id ? (
-                                        <div className="confirm-actions">
-                                            <span className="confirm-text">¿Eliminar?</span>
-                                            <button className="confirm-yes" onClick={() => handleDelete(cat.id)}>Sí</button>
-                                            <button className="confirm-no" onClick={() => setConfirmId(null)}>No</button>
-                                        </div>
-                                    ) : (
-                                        <div className="action-buttons">
-                                            <button className="edit-btn" onClick={() => handleEdit(cat)}>Editar</button>
-                                            <button className="delete-btn" onClick={() => setConfirmId(cat.id)}>Eliminar</button>
-                                        </div>
-                                    )}
+                                    <div className="action-buttons">
+                                        <button className="edit-btn" onClick={() => handleEdit(cat)}>Editar</button>
+                                        <button className="delete-btn" onClick={() => handleDeleteClick(cat)}>Eliminar</button>
+                                    </div>
                                 </td>
                             </tr>
                         ))}
@@ -85,6 +91,14 @@ const CategoriesManager = () => {
                     onClose={() => { setShowForm(false); setEditingCategory(null) }}
                 />
             )}
+
+            <DeleteCategoryModal
+                isOpen={!!categoryToDelete}
+                onClose={handleCloseDeleteModal}
+                category={categoryToDelete}
+                onConfirm={handleConfirmDelete}
+                loading={deleting}
+            />
         </div>
     )
 }

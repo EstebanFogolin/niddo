@@ -5,6 +5,12 @@ import { API_URL, resolveImageUrl } from "../config/api.js"
 
 const mapApiProductToCard = (product) => {
     const cat = product.categoria
+    const promedio = product.promedioPuntuacion || 0
+    const total = product.totalResenas || 0
+    const fullStars = Math.floor(promedio)
+    const hasHalf = promedio % 1 >= 0.5
+    const starsDisplay = fullStars + (hasHalf ? 0.5 : 0)
+
     return {
         id: `api-${product.id}`,
         title: product.nombre,
@@ -12,13 +18,16 @@ const mapApiProductToCard = (product) => {
         category: cat?.titulo || 'Hotel',
         categoryId: cat?.id || null,
         categoryData: cat || null,
-        stars: 5,
-        score: 8,
-        scoreLabel: 'Muy bueno',
+        stars: starsDisplay,
+        score: Math.round(promedio * 10),
+        scoreLabel: total > 0 ? `${total} reseñas` : 'Sin reseñas',
         distance: '0 km del centro',
         img: resolveImageUrl(product.imagenes?.[0]),
         images: product.imagenes?.map(resolveImageUrl) || [],
-        caracteristicas: product.caracteristicas || []
+        caracteristicas: product.caracteristicas || [],
+        promedioPuntuacion: promedio,
+        totalResenas: total,
+        distribucionEstrellas: product.distribucionEstrellas || [0, 0, 0, 0, 0]
     }
 }
 
