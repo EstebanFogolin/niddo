@@ -15,21 +15,10 @@ public class AdminUserService {
     }
 
     public List<UsuarioResponse> listar() {
-        System.out.println("[AdminUserService] listar called");
-        try {
-            List<UsuarioResponse> result = usuarioRepository.findAll()
-                    .stream()
-                    .map(u -> {
-                        System.out.println("[AdminUserService] Mapping user: " + u.getEmail() + " role=" + u.getRole());
-                        return UsuarioResponse.fromEntity(u);
-                    })
-                    .toList();
-            System.out.println("[AdminUserService] Found " + result.size() + " users");
-            return result;
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw e;
-        }
+        return usuarioRepository.findAll()
+                .stream()
+                .map(UsuarioResponse::fromEntity)
+                .toList();
     }
 
     @Transactional

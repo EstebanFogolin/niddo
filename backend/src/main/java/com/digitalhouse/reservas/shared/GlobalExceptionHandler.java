@@ -76,6 +76,55 @@ public class GlobalExceptionHandler {
                 .body(new ApiError(exception.getMessage()));
     }
 
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ApiError> handleIllegalState(IllegalStateException exception) {
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(new ApiError(exception.getMessage()));
+    }
+
+    @ExceptionHandler(SecurityException.class)
+    public ResponseEntity<ApiError> handleSecurity(SecurityException exception) {
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(new ApiError(exception.getMessage()));
+    }
+
+    @ExceptionHandler(AccesoDenegadoException.class)
+    public ResponseEntity<ApiError> handleAccesoDenegado(AccesoDenegadoException exception) {
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(new ApiError(exception.getMessage()));
+    }
+
+    @ExceptionHandler(ResenaYaExistenteException.class)
+    public ResponseEntity<ApiError> handleResenaYaExistente(ResenaYaExistenteException exception) {
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(new ApiError(exception.getMessage()));
+    }
+
+    @ExceptionHandler(ResenaNoPermitidaException.class)
+    public ResponseEntity<ApiError> handleResenaNoPermitida(ResenaNoPermitidaException exception) {
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(new ApiError(exception.getMessage()));
+    }
+
+    @ExceptionHandler(ReservaNoDisponibleException.class)
+    public ResponseEntity<ApiError> handleReservaNoDisponible(ReservaNoDisponibleException exception) {
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(new ApiError(exception.getMessage()));
+    }
+
+    @ExceptionHandler(NombreCaracteristicaDuplicadoException.class)
+    public ResponseEntity<ApiError> handleNombreCaracteristicaDuplicado(NombreCaracteristicaDuplicadoException exception) {
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(new ApiError(exception.getMessage()));
+    }
+
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ApiError> handleDataIntegrityViolation() {
         return ResponseEntity

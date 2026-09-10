@@ -1,5 +1,6 @@
 package com.digitalhouse.reservas.caracteristica;
 
+import com.digitalhouse.reservas.shared.NombreCaracteristicaDuplicadoException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,7 +22,7 @@ public class CaracteristicaService {
 
     public Caracteristica crear(String nombre, String icono) {
         if (repository.existsByNombreIgnoreCase(nombre.trim())) {
-            throw new IllegalArgumentException("Ya existe una característica con ese nombre.");
+            throw new NombreCaracteristicaDuplicadoException();
         }
 
         Caracteristica c = new Caracteristica(nombre.trim(), icono.trim());

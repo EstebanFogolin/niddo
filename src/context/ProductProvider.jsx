@@ -37,6 +37,9 @@ function fetchJson(url, options) {
             const err = await res.json().catch(() => null)
             throw new Error(err?.mensaje || 'Error en la petición.')
         }
+        if (res.status === 204 || res.headers.get('content-length') === '0') {
+            return null
+        }
         return res.json()
     })
 }

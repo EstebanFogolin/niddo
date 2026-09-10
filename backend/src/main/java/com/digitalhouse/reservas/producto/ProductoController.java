@@ -41,16 +41,6 @@ public class ProductoController {
         return productoService.listar(categoriaIds);
     }
 
-    @GetMapping("/test-endpoint")
-    public String test() {
-        return "ProductoController test works";
-    }
-
-    @GetMapping(value = "/test-works", produces = "text/plain")
-    public String testWorks() {
-        return "Test works";
-    }
-
     @GetMapping("/{id:\\d+}")
     public ProductoResponse obtener(@PathVariable Long id) {
         return productoService.obtenerPorId(id);

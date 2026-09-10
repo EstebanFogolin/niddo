@@ -82,7 +82,9 @@ public class ProductoService {
                 String fileName = imagenUrl.substring(imagenUrl.lastIndexOf("/") + 1);
                 Path filePath = uploadPath.resolve(fileName).normalize();
                 Files.deleteIfExists(filePath);
-            } catch (IOException ignored) {
+            } catch (IOException e) {
+                // Log warning but continue - file may already be deleted or not accessible
+                System.err.println("Advertencia: No se pudo eliminar archivo de imagen: " + imagenUrl + " - " + e.getMessage());
             }
         });
 
@@ -110,7 +112,8 @@ public class ProductoService {
                     String fileName = imagenUrl.substring(imagenUrl.lastIndexOf("/") + 1);
                     Path filePath = uploadPath.resolve(fileName).normalize();
                     Files.deleteIfExists(filePath);
-                } catch (IOException ignored) {
+                } catch (IOException e) {
+                    System.err.println("Advertencia: No se pudo eliminar archivo de imagen: " + imagenUrl + " - " + e.getMessage());
                 }
             });
             producto.setImagenes(guardarImagenes(imagenes));

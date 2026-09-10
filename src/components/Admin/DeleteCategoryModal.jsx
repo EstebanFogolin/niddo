@@ -31,6 +31,7 @@ const DeleteCategoryModal = ({ isOpen, onClose, category, onConfirm, loading }) 
     }
   }, [onClose])
 
+  // Handle focus, keyboard listeners and body scroll
   useEffect(() => {
     if (isOpen) {
       previousActiveElement.current = document.activeElement
@@ -38,7 +39,6 @@ const DeleteCategoryModal = ({ isOpen, onClose, category, onConfirm, loading }) 
       const focusable = modalRef.current?.querySelector('.delete-modal-cancel')
       focusable?.focus()
       document.addEventListener('keydown', handleKeyDown)
-      setConfirmText('')
     } else {
       document.body.style.overflow = ''
       previousActiveElement.current?.focus()
@@ -48,6 +48,14 @@ const DeleteCategoryModal = ({ isOpen, onClose, category, onConfirm, loading }) 
       document.removeEventListener('keydown', handleKeyDown)
     }
   }, [isOpen, handleKeyDown])
+
+  // Reset confirm text when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setConfirmText('')
+    }
+  }, [isOpen])
 
   const handleOverlayClick = (e) => {
     if (e.target === e.currentTarget) {
@@ -62,7 +70,8 @@ const DeleteCategoryModal = ({ isOpen, onClose, category, onConfirm, loading }) 
     try {
       await onConfirm()
       onClose()
-    } catch (_err) {
+    } catch {
+      // Error handled by onConfirm - keep modal open for retry
     }
   }
 

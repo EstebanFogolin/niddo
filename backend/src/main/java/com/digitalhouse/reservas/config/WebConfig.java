@@ -5,9 +5,23 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
-    // Image serving is handled by ImageController
-    // This class kept for other potential resource handlers
+    @Value("${app.upload-dir:uploads/productos}")
+    private String uploadDir;
+
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        Path uploadPath = Paths.get(uploadDir).toAbsolutePath();
+        String resourceLocation = uploadPath.toUri().toString();
+
+        registry.addResourceHandler("/uploads/productos/**")
+                .addResourceLocations(resourceLocation)
+                .setCachePeriod(3600)
+                .resourceChain(true);
+    }
 }

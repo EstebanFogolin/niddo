@@ -4,7 +4,11 @@ import com.digitalhouse.reservas.auth.Usuario;
 import com.digitalhouse.reservas.auth.UsuarioRepository;
 import com.digitalhouse.reservas.producto.Producto;
 import com.digitalhouse.reservas.producto.ProductoRepository;
-import com.digitalhouse.reservas.shared.ApiError;
+import com.digitalhouse.reservas.shared.AccesoDenegadoException;
+import com.digitalhouse.reservas.shared.ResenaNoPermitidaException;
+import com.digitalhouse.reservas.shared.ResenaYaExistenteException;
+
+import java.util.NoSuchElementException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -12,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @Service
 @Transactional
@@ -37,11 +40,11 @@ public class ResenaService {
                 .orElseThrow(() -> new NoSuchElementException("Producto no encontrado."));
 
         if (resenaRepository.existsByUsuarioIdAndProductoId(usuarioId, productoId)) {
-            throw new IllegalStateException("Ya has valorado este producto.");
+            throw new ResenaYaExistenteException();
         }
 
         if (!resenaRepository.hasCompletedReservation(usuarioId, productoId)) {
-            throw new IllegalStateException("Solo puedes valorar productos de los que hayas completado una reserva.");
+            throw new ResenaNoPermitidaException();
         }
 
         Resena resena = new Resena(producto, usuario, request.puntuacion(), request.comentario());
@@ -85,7 +88,7 @@ public class ResenaService {
                 .orElseThrow(() -> new NoSuchElementException("Reseña no encontrada."));
 
         if (!resena.getUsuario().getId().equals(usuarioId)) {
-            throw new SecurityException("No tienes permiso para editar esta reseña.");
+            throw new AccesoDenegadoException("No tienes permiso para editar esta reseña.");
         }
 
         resena.setPuntuacion(request.puntuacion());
@@ -99,7 +102,7 @@ public class ResenaService {
                 .orElseThrow(() -> new NoSuchElementException("Reseña no encontrada."));
 
         if (!isAdmin && !resena.getUsuario().getId().equals(usuarioId)) {
-            throw new SecurityException("No tienes permiso para eliminar esta reseña.");
+            throw new AccesoDenegadoException("No tienes permiso para eliminar esta reseña.");
         }
 
         resenaRepository.delete(resena);

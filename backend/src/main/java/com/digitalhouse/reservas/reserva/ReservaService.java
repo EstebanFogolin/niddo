@@ -4,6 +4,8 @@ import com.digitalhouse.reservas.auth.Usuario;
 import com.digitalhouse.reservas.producto.Producto;
 import com.digitalhouse.reservas.producto.ProductoRepository;
 import com.digitalhouse.reservas.auth.UsuarioRepository;
+import com.digitalhouse.reservas.shared.AccesoDenegadoException;
+import com.digitalhouse.reservas.shared.ReservaNoDisponibleException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -63,7 +65,7 @@ public class ReservaService {
         List<Reserva.Estado> estadosActivos = List.of(Reserva.Estado.PENDIENTE, Reserva.Estado.CONFIRMADA);
         List<Reserva> solapadas = reservaRepository.findOcupadasEnRango(productoId, estadosActivos, fechaInicio, fechaFin);
         if (!solapadas.isEmpty()) {
-            throw new IllegalStateException("El producto no está disponible en esas fechas.");
+            throw new ReservaNoDisponibleException();
         }
 
         Reserva reserva = new Reserva(producto, usuario, fechaInicio, fechaFin);
@@ -75,7 +77,7 @@ public class ReservaService {
                 .orElseThrow(() -> new IllegalArgumentException("Reserva no encontrada."));
 
         if (!reserva.getUsuario().getId().equals(usuarioId)) {
-            throw new SecurityException("No tienes permiso para cancelar esta reserva.");
+            throw new AccesoDenegadoException("No tienes permiso para cancelar esta reserva.");
         }
 
         reserva.setEstado(Reserva.Estado.CANCELADA);

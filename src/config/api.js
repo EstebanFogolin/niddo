@@ -3,9 +3,13 @@ export const API_URL = 'http://localhost:8080'
 export const resolveImageUrl = (path) => {
     if (!path) return ''
     if (path.startsWith('http://') || path.startsWith('https://')) return path
-    // Usar el nuevo endpoint del controlador de imágenes
+    // Las imagenes ya vienen con ruta relativa /uploads/productos/... desde el backend
+    if (path.startsWith('/uploads/')) {
+        return `${API_URL}${path}`
+    }
+    // Fallback para compatibilidad: extraer filename y usar ruta estatica
     const filename = path.split('/').pop()
-    return `${API_URL}/api/productos/image/${filename}`
+    return `${API_URL}/uploads/productos/${filename}`
 }
 
 export const reservasApi = {
