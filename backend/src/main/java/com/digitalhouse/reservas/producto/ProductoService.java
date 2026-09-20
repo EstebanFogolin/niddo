@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -67,6 +68,15 @@ public class ProductoService {
                 .toList();
     }
 
+    public List<ProductoResponse> listarDisponibles(List<Long> categoriaIds, String q, Long usuarioId, LocalDate fechaInicio, LocalDate fechaFin) {
+        List<Long> ids = (categoriaIds != null && !categoriaIds.isEmpty()) ? categoriaIds : null;
+        String query = (q != null) ? q.trim() : null;
+        List<Producto> productos = productoRepository.findDisponibles(ids, query, usuarioId, fechaInicio, fechaFin);
+        return productos.stream()
+                .map(ProductoResponse::fromEntity)
+                .toList();
+    }
+
     public ProductoResponse obtenerPorId(Long id) {
         Producto producto = productoRepository.findByIdWithResenas(id)
                 .orElseThrow(() -> new java.util.NoSuchElementException("Producto no encontrado."));
@@ -91,7 +101,7 @@ public class ProductoService {
         productoRepository.deleteById(id);
     }
 
-    public ProductoResponse actualizar(Long id, String nombre, String descripcion, Long categoriaId, MultipartFile[] imagenes, List<Long> caracteristicasIds) {
+    public ProductoResponse actualizar(Long id, String nombre, String descripcion, Long categoriaId, MultipartFile[] imagenes, List<Long> caracteristicasIds, String contactoEmail, String contactoTelefono) {
         Producto producto = productoRepository.findById(id)
                 .orElseThrow(() -> new java.util.NoSuchElementException("Producto no encontrado."));
 
@@ -122,12 +132,18 @@ public class ProductoService {
             List<Caracteristica> caracteristicas = caracteristicaRepository.findAllById(caracteristicasIds);
             producto.setCaracteristicas(caracteristicas);
         }
+        if (contactoEmail != null) {
+            producto.setContactoEmail(normalizarContactoEmail(contactoEmail));
+        }
+        if (contactoTelefono != null) {
+            producto.setContactoTelefono(normalizarContactoTelefono(contactoTelefono));
+        }
 
         Producto productoGuardado = productoRepository.save(producto);
         return ProductoResponse.fromEntity(productoGuardado);
     }
 
-    public ProductoResponse crear(String nombre, String descripcion, Long categoriaId, MultipartFile[] imagenes, List<Long> caracteristicasIds) {
+    public ProductoResponse crear(String nombre, String descripcion, Long categoriaId, MultipartFile[] imagenes, List<Long> caracteristicasIds, String contactoEmail, String contactoTelefono) {
         if (productoRepository.existsByNombreIgnoreCase(nombre.trim())) {
             throw new NombreProductoDuplicadoException("El nombre ya esta en uso.");
         }
@@ -140,6 +156,8 @@ public class ProductoService {
 
         List<String> urlsImagenes = guardarImagenes(imagenes);
         Producto producto = new Producto(nombre.trim(), descripcion.trim(), categoria, urlsImagenes);
+        producto.setContactoEmail(normalizarContactoEmail(contactoEmail));
+        producto.setContactoTelefono(normalizarContactoTelefono(contactoTelefono));
 
         if (caracteristicasIds != null && !caracteristicasIds.isEmpty()) {
             List<Caracteristica> caracteristicas = caracteristicaRepository.findAllById(caracteristicasIds);
@@ -149,6 +167,24 @@ public class ProductoService {
         Producto productoGuardado = productoRepository.save(producto);
 
         return ProductoResponse.fromEntity(productoGuardado);
+    }
+
+    private String normalizarContactoEmail(String contactoEmail) {
+        if (contactoEmail == null || contactoEmail.isBlank()) {
+            return null;
+        }
+        String email = contactoEmail.trim();
+        if (!email.contains("@")) {
+            throw new IllegalArgumentException("El email de contacto no es válido.");
+        }
+        return email;
+    }
+
+    private String normalizarContactoTelefono(String contactoTelefono) {
+        if (contactoTelefono == null || contactoTelefono.isBlank()) {
+            return null;
+        }
+        return contactoTelefono.trim();
     }
 
     private List<String> guardarImagenes(MultipartFile[] imagenes) {

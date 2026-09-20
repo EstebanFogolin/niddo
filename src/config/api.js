@@ -1,5 +1,9 @@
 export const API_URL = 'http://localhost:8080'
 
+// Número de soporte para el botón flotante de WhatsApp (formato internacional,
+// solo dígitos, sin "+" ni espacios). Reemplazar por el número real.
+export const WHATSAPP_NUMBER = ''
+
 export const resolveImageUrl = (path) => {
     if (!path) return ''
     if (path.startsWith('http://') || path.startsWith('https://')) return path
@@ -36,6 +40,20 @@ export const reservasApi = {
             if (!r.ok) throw new Error('Error al cargar disponibilidad');
             return r.json();
         }),
+}
+
+export const productosApi = {
+    listar: (params = {}) => {
+        const searchParams = new URLSearchParams()
+        if (params.categoriaIds?.length) searchParams.append('categoriaIds', params.categoriaIds.join(','))
+        if (params.q) searchParams.append('q', params.q)
+        if (params.fechaInicio) searchParams.append('fechaInicio', params.fechaInicio)
+        if (params.fechaFin) searchParams.append('fechaFin', params.fechaFin)
+        return fetch(`${API_URL}/api/productos?${searchParams}`).then(async (r) => {
+            if (!r.ok) throw new Error('Error al cargar productos')
+            return r.json()
+        })
+    }
 }
 
 export const resenasApi = {

@@ -16,11 +16,13 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
     List<Reserva> findByProductoIdAndEstadoIn(Long productoId, List<Reserva.Estado> estados);
 
     @Query("SELECT r FROM Reserva r WHERE r.producto.id = :productoId " +
+           "AND r.usuario.id = :usuarioId " +
            "AND r.estado IN :estados " +
            "AND r.fechaFin >= :desde " +
            "AND r.fechaInicio <= :hasta")
-    List<Reserva> findOcupadasEnRango(
+    List<Reserva> findOcupadasEnRangoPorUsuario(
             @Param("productoId") Long productoId,
+            @Param("usuarioId") Long usuarioId,
             @Param("estados") List<Reserva.Estado> estados,
             @Param("desde") LocalDate desde,
             @Param("hasta") LocalDate hasta

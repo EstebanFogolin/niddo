@@ -138,6 +138,10 @@ const ProductPolicies = ({ category }) => {
                         <p className="policy-description">{p.descripcion}</p>
                     </article>
                 ))}
+                <article className="policy-card">
+                    <h4 className="policy-title">Contacto por WhatsApp</h4>
+                    <p className="policy-description">Podés escribirnos por WhatsApp con el botón flotante. El chat se abre fuera de Niddo y rige la política de privacidad de WhatsApp: no almacenamos ni accedemos a esos mensajes.</p>
+                </article>
             </div>
         </section>
     )

@@ -194,10 +194,30 @@
     color: #666;
 }
 
-.rango-seleccionado + .btn-reservar,
-.rango-seleccionado ~ .reserva-exitosa + .btn-reservar,
-.rango-seleccionado ~ .reserva-error + .btn-reservar {
+.rango-seleccionado + .reserva-cta,
+.rango-seleccionado ~ .reserva-cta {
     margin-top: 16px;
+}
+
+.reserva-cta {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.reserva-cta-message {
+    margin: 0;
+    padding: 12px 16px;
+    background: #fff8e1;
+    border: 1px solid #ffecb3;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #5d4037;
+    text-align: center;
+}
+
+.reserva-cta-message strong {
+    color: #2F3A6B;
 }
 
 .btn-reservar {
@@ -218,61 +238,14 @@
     box-shadow: 0 4px 12px rgba(232, 185, 35, 0.3);
 }
 
-.btn-reservar:hover:not(:disabled) {
+.btn-reservar:hover {
     background: linear-gradient(135deg, #f0c83a 0%, #f4d45a 100%);
     transform: translateY(-2px);
     box-shadow: 0 6px 16px rgba(232, 185, 35, 0.4);
 }
 
-.btn-reservar:disabled {
-    opacity: 0.7;
-    cursor: not-allowed;
-    transform: none;
-}
-
-.btn-reservar .spinner {
-    animation: spin 1s linear infinite;
-}
-
 @keyframes spin {
     to { transform: rotate(360deg); }
-}
-
-.reserva-exitosa {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    margin-top: 16px;
-    padding: 14px 20px;
-    background: #e8f5e9;
-    border: 1px solid #c8e6c9;
-    border-radius: 10px;
-    color: #2e7d32;
-    font-weight: 600;
-    font-size: 14px;
-    animation: fadeIn 0.3s ease;
-}
-
-.reserva-error {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    margin-top: 16px;
-    padding: 14px 20px;
-    background: #fdecea;
-    border: 1px solid #f5c6cb;
-    border-radius: 10px;
-    color: #721c24;
-    font-weight: 500;
-    font-size: 14px;
-    animation: fadeIn 0.3s ease;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
 }
 
 @media (max-width: 767px) {

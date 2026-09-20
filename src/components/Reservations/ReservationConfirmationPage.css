@@ -1,0 +1,236 @@
+.confirmation-page {
+    background-color: #2F3A6B;
+    min-height: 100vh;
+    padding-top: 96px;
+    padding-bottom: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.confirmation-pass {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+    max-width: 560px;
+    width: calc(100% - 48px);
+    margin: 24px auto;
+    padding: 40px 40px 32px;
+    text-align: center;
+    animation: passIn 0.35s ease;
+}
+
+@keyframes passIn {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.confirmation-seal {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 88px;
+    height: 88px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #e8b923 0%, #d4a81e 100%);
+    color: #1a1a2e;
+    box-shadow: 0 6px 20px rgba(232, 185, 35, 0.45);
+    margin-bottom: 20px;
+}
+
+.seal-check {
+    stroke-dasharray: 30;
+    stroke-dashoffset: 30;
+    animation: sealDraw 0.5s ease 0.15s forwards;
+}
+
+@keyframes sealDraw {
+    to { stroke-dashoffset: 0; }
+}
+
+.confirmation-eyebrow {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #8a6d1b;
+    margin: 0 0 8px;
+}
+
+.confirmation-title {
+    font-size: 28px;
+    font-weight: 800;
+    color: #1a1a2e;
+    margin: 0 0 8px;
+}
+
+.confirmation-subtitle {
+    font-size: 16px;
+    color: #555;
+    margin: 0;
+}
+
+.confirmation-perforation {
+    height: 2px;
+    margin: 28px -40px;
+    background-image: linear-gradient(to right, #d9d9d9 55%, transparent 45%);
+    background-size: 14px 2px;
+    background-repeat: repeat-x;
+    position: relative;
+}
+
+.confirmation-perforation::before,
+.confirmation-perforation::after {
+    content: '';
+    position: absolute;
+    top: -11px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: #2F3A6B;
+}
+
+.confirmation-perforation::before {
+    left: -12px;
+}
+
+.confirmation-perforation::after {
+    right: -12px;
+}
+
+.confirmation-stub {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px 24px;
+    margin: 0 0 28px;
+    text-align: left;
+}
+
+.confirmation-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin: 0;
+}
+
+.confirmation-field dt {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #999;
+    font-weight: 700;
+}
+
+.confirmation-field dd {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1a1a2e;
+    margin: 0;
+    overflow-wrap: break-word;
+}
+
+.confirmation-email {
+    font-weight: 400;
+    color: #555;
+}
+
+.confirmation-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.confirmation-actions .btn-primary,
+.confirmation-actions .btn-secondary {
+    flex: 1;
+}
+
+.confirmation-page .btn-primary {
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #e8b923 0%, #d4a81e 100%);
+    color: #1a1a2e;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 12px rgba(232, 185, 35, 0.3);
+}
+
+.confirmation-page .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(232, 185, 35, 0.4);
+}
+
+.confirmation-page .btn-secondary {
+    padding: 12px 20px;
+    background: transparent;
+    color: #666;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.confirmation-page .btn-secondary:hover {
+    background: #f5f5f5;
+    border-color: #ccc;
+}
+
+.confirmation-page .reservation-status {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+.confirmation-page .status-pendiente {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.confirmation-page .btn-primary:focus-visible,
+.confirmation-page .btn-secondary:focus-visible {
+    outline: 2px solid #e8b923;
+    outline-offset: 2px;
+}
+
+@media (max-width: 768px) {
+    .confirmation-page {
+        padding-top: 120px;
+    }
+
+    .confirmation-pass {
+        padding: 32px 24px 28px;
+    }
+
+    .confirmation-perforation {
+        margin: 24px -24px;
+    }
+
+    .confirmation-stub {
+        grid-template-columns: 1fr;
+    }
+
+    .confirmation-actions {
+        flex-direction: column;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .confirmation-pass,
+    .seal-check {
+        animation: none;
+    }
+
+    .seal-check {
+        stroke-dashoffset: 0;
+    }
+}

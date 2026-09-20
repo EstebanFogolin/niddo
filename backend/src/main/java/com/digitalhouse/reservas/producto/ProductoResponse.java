@@ -13,7 +13,9 @@ public record ProductoResponse(
         List<Map<String, Object>> caracteristicas,
         Double promedioPuntuacion,
         Long totalResenas,
-        Integer[] distribucionEstrellas
+        Integer[] distribucionEstrellas,
+        String contactoEmail,
+        String contactoTelefono
 ) {
     public static ProductoResponse fromEntity(Producto producto) {
         List<Map<String, Object>> caracs = producto.getCaracteristicas()
@@ -57,7 +59,9 @@ public record ProductoResponse(
                 caracs,
                 promedio,
                 total,
-                distribucion
+                distribucion,
+                producto.getContactoEmail(),
+                producto.getContactoTelefono()
         );
     }
 }

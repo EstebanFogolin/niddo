@@ -284,6 +284,37 @@
     outline-offset: 2px;
 }
 
+.product-detail-reservations {
+    align-items: center;
+    background-color: #e8b923;
+    border: none;
+    border-radius: 8px;
+    color: #1a1a2e;
+    cursor: pointer;
+    display: flex;
+    gap: 8px;
+    height: 44px;
+    padding: 0 16px;
+    text-decoration: none;
+    transition: all 0.2s;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.product-detail-reservations:hover {
+    background-color: #f0c83a;
+    transform: scale(1.05);
+}
+
+.product-detail-reservations:focus-visible {
+    outline: 2px solid #e8b923;
+    outline-offset: 2px;
+}
+
+.reservations-label {
+    white-space: nowrap;
+}
+
 .product-detail-reviews {
     margin-top: 32px;
     padding-top: 24px;

@@ -3,6 +3,7 @@ package com.digitalhouse.reservas.producto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Validated
@@ -32,13 +34,28 @@ public class ProductoController {
 
     @GetMapping
     public List<ProductoResponse> listar(
+            Authentication authentication,
             @RequestParam(required = false) List<Long> categoriaIds,
-            @RequestParam(required = false) String q
+            @RequestParam(required = false) String q,
+            @RequestParam(required = false) String fechaInicio,
+            @RequestParam(required = false) String fechaFin
     ) {
+        if (fechaInicio != null && !fechaInicio.isBlank() && fechaFin != null && !fechaFin.isBlank()) {
+            LocalDate inicio = LocalDate.parse(fechaInicio);
+            LocalDate fin = LocalDate.parse(fechaFin);
+            return productoService.listarDisponibles(categoriaIds, q, extractUsuarioId(authentication), inicio, fin);
+        }
         if (q != null && !q.isBlank()) {
             return productoService.buscar(q);
         }
         return productoService.listar(categoriaIds);
+    }
+
+    private static Long extractUsuarioId(Authentication authentication) {
+        if (authentication != null && authentication.getPrincipal() instanceof Long id) {
+            return id;
+        }
+        return null;
     }
 
     @GetMapping("/{id:\\d+}")
@@ -59,9 +76,11 @@ public class ProductoController {
             @RequestParam @NotBlank String descripcion,
             @RequestParam(required = false) Long categoriaId,
             @RequestParam("imagenes") @NotEmpty MultipartFile[] imagenes,
-            @RequestParam(required = false) List<Long> caracteristicas
+            @RequestParam(required = false) List<Long> caracteristicas,
+            @RequestParam(required = false) String contactoEmail,
+            @RequestParam(required = false) String contactoTelefono
     ) {
-        return productoService.crear(nombre, descripcion, categoriaId, imagenes, caracteristicas);
+        return productoService.crear(nombre, descripcion, categoriaId, imagenes, caracteristicas, contactoEmail, contactoTelefono);
     }
 
     @PutMapping("/{id}")
@@ -71,8 +90,10 @@ public class ProductoController {
             @RequestParam(required = false) String descripcion,
             @RequestParam(required = false) Long categoriaId,
             @RequestParam(value = "imagenes", required = false) MultipartFile[] imagenes,
-            @RequestParam(required = false) List<Long> caracteristicas
+            @RequestParam(required = false) List<Long> caracteristicas,
+            @RequestParam(required = false) String contactoEmail,
+            @RequestParam(required = false) String contactoTelefono
     ) {
-        return productoService.actualizar(id, nombre, descripcion, categoriaId, imagenes, caracteristicas);
+        return productoService.actualizar(id, nombre, descripcion, categoriaId, imagenes, caracteristicas, contactoEmail, contactoTelefono);
     }
 }

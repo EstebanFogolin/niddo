@@ -1,6 +1,7 @@
 package com.digitalhouse.reservas.reserva;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,15 +23,17 @@ public class ReservaController {
 
     @GetMapping("/producto/{productoId}/disponibilidad")
     public Map<String, Object> disponibilidad(
+            Authentication authentication,
             @PathVariable Long productoId,
             @RequestParam String desde,
             @RequestParam String hasta
     ) {
         LocalDate d = LocalDate.parse(desde, DateTimeFormatter.ISO_DATE);
         LocalDate h = LocalDate.parse(hasta, DateTimeFormatter.ISO_DATE);
+        Long usuarioId = extractUsuarioId(authentication);
 
-        List<LocalDate> ocupadas = reservaService.getFechasOcupadas(productoId, d, h);
-        List<LocalDate> disponibles = reservaService.getFechasDisponibles(productoId, d, h);
+        List<LocalDate> ocupadas = reservaService.getFechasOcupadas(productoId, usuarioId, d, h);
+        List<LocalDate> disponibles = reservaService.getFechasDisponibles(productoId, usuarioId, d, h);
 
         return Map.of(
                 "productoId", productoId,
@@ -67,6 +70,13 @@ public class ReservaController {
         return reservaService.listarPorUsuario(usuarioId).stream()
                 .map(ReservaResponse::fromEntity)
                 .toList();
+    }
+
+    private static Long extractUsuarioId(Authentication authentication) {
+        if (authentication != null && authentication.getPrincipal() instanceof Long id) {
+            return id;
+        }
+        return null;
     }
 
     public static class CrearReservaRequest {

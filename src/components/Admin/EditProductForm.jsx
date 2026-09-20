@@ -12,7 +12,9 @@ const EditProductForm = ({ product, onClose }) => {
         name: product.title || '',
         description: product.description || '',
         categoryId: product.categoryId || '',
-        caracteristicas: [...currentFeatureIds]
+        caracteristicas: [...currentFeatureIds],
+        contactoEmail: product.contactoEmail || '',
+        contactoTelefono: product.contactoTelefono || ''
     })
 
     const [errors, setErrors] = useState({})
@@ -36,6 +38,11 @@ const EditProductForm = ({ product, onClose }) => {
                 if (trimmed && trimmed.length < 10) return 'La descripción debe tener al menos 10 caracteres.'
                 return ''
             }
+            case 'contactoEmail': {
+                const trimmed = value.trim()
+                if (trimmed && !trimmed.includes('@')) return 'El email de contacto no es válido.'
+                return ''
+            }
             default:
                 return ''
         }
@@ -51,7 +58,8 @@ const EditProductForm = ({ product, onClose }) => {
     const validateForm = () => {
         const newErrors = {
             name: validateField('name', formData.name),
-            description: validateField('description', formData.description)
+            description: validateField('description', formData.description),
+            contactoEmail: validateField('contactoEmail', formData.contactoEmail)
         }
         setErrors(newErrors)
         return !Object.values(newErrors).some(Boolean)
@@ -126,6 +134,31 @@ const EditProductForm = ({ product, onClose }) => {
                                 <option key={cat.id} value={cat.id}>{cat.titulo}</option>
                             ))}
                         </select>
+                    </div>
+
+                    <div className={`form-group${errors.contactoEmail ? ' has-error' : ''}`}>
+                        <label htmlFor="contactoEmail">Email de contacto del proveedor (opcional)</label>
+                        <input
+                            id="contactoEmail"
+                            type="email"
+                            name="contactoEmail"
+                            value={formData.contactoEmail}
+                            onChange={handleChange}
+                            placeholder="proveedor@ejemplo.com"
+                        />
+                        {errors.contactoEmail && <span className="field-error">{errors.contactoEmail}</span>}
+                    </div>
+
+                    <div className="form-group">
+                        <label htmlFor="contactoTelefono">Teléfono de contacto del proveedor (opcional)</label>
+                        <input
+                            id="contactoTelefono"
+                            type="tel"
+                            name="contactoTelefono"
+                            value={formData.contactoTelefono}
+                            onChange={handleChange}
+                            placeholder="+54 11 1234 5678"
+                        />
                     </div>
 
                     {features.length > 0 && (

@@ -37,6 +37,12 @@ public class Producto {
     @Column(nullable = false, length = 1000)
     private String descripcion;
 
+    @Column(name = "contacto_email")
+    private String contactoEmail;
+
+    @Column(name = "contacto_telefono")
+    private String contactoTelefono;
+
     @ManyToOne
     @JoinColumn(name = "categoria_id")
     private Categoria categoria;
@@ -81,6 +87,12 @@ public class Producto {
 
     public String getDescripcion() { return descripcion; }
     public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
+
+    public String getContactoEmail() { return contactoEmail; }
+    public void setContactoEmail(String contactoEmail) { this.contactoEmail = contactoEmail; }
+
+    public String getContactoTelefono() { return contactoTelefono; }
+    public void setContactoTelefono(String contactoTelefono) { this.contactoTelefono = contactoTelefono; }
 
     public Categoria getCategoria() { return categoria; }
     public void setCategoria(Categoria categoria) { this.categoria = categoria; }

@@ -1,6 +1,7 @@
 package com.digitalhouse.reservas.reserva;
 
 import com.digitalhouse.reservas.auth.Usuario;
+import com.digitalhouse.reservas.email.EmailService;
 import com.digitalhouse.reservas.producto.Producto;
 import com.digitalhouse.reservas.producto.ProductoRepository;
 import com.digitalhouse.reservas.auth.UsuarioRepository;
@@ -21,28 +22,34 @@ public class ReservaService {
     private final ReservaRepository reservaRepository;
     private final ProductoRepository productoRepository;
     private final UsuarioRepository usuarioRepository;
+    private final EmailService emailService;
 
     public ReservaService(
             ReservaRepository reservaRepository,
             ProductoRepository productoRepository,
-            UsuarioRepository usuarioRepository
+            UsuarioRepository usuarioRepository,
+            EmailService emailService
     ) {
         this.reservaRepository = reservaRepository;
         this.productoRepository = productoRepository;
         this.usuarioRepository = usuarioRepository;
+        this.emailService = emailService;
     }
 
-    public List<LocalDate> getFechasOcupadas(Long productoId, LocalDate desde, LocalDate hasta) {
+    public List<LocalDate> getFechasOcupadas(Long productoId, Long usuarioId, LocalDate desde, LocalDate hasta) {
+        if (usuarioId == null) {
+            return List.of();
+        }
         List<Reserva.Estado> estadosActivos = List.of(Reserva.Estado.PENDIENTE, Reserva.Estado.CONFIRMADA);
-        List<Reserva> reservas = reservaRepository.findOcupadasEnRango(productoId, estadosActivos, desde, hasta);
+        List<Reserva> reservas = reservaRepository.findOcupadasEnRangoPorUsuario(productoId, usuarioId, estadosActivos, desde, hasta);
 
         return reservas.stream()
                 .flatMap(r -> r.getFechaInicio().datesUntil(r.getFechaFin().plusDays(1)))
                 .collect(Collectors.toList());
     }
 
-    public List<LocalDate> getFechasDisponibles(Long productoId, LocalDate desde, LocalDate hasta) {
-        List<LocalDate> ocupadas = getFechasOcupadas(productoId, desde, hasta);
+    public List<LocalDate> getFechasDisponibles(Long productoId, Long usuarioId, LocalDate desde, LocalDate hasta) {
+        List<LocalDate> ocupadas = getFechasOcupadas(productoId, usuarioId, desde, hasta);
 
         return desde.datesUntil(hasta.plusDays(1))
                 .filter(d -> !ocupadas.contains(d))
@@ -63,13 +70,20 @@ public class ReservaService {
                 .orElseThrow(() -> new IllegalArgumentException("Producto no encontrado."));
 
         List<Reserva.Estado> estadosActivos = List.of(Reserva.Estado.PENDIENTE, Reserva.Estado.CONFIRMADA);
-        List<Reserva> solapadas = reservaRepository.findOcupadasEnRango(productoId, estadosActivos, fechaInicio, fechaFin);
+        List<Reserva> solapadas = reservaRepository.findOcupadasEnRangoPorUsuario(productoId, usuarioId, estadosActivos, fechaInicio, fechaFin);
         if (!solapadas.isEmpty()) {
             throw new ReservaNoDisponibleException();
         }
 
         Reserva reserva = new Reserva(producto, usuario, fechaInicio, fechaFin);
-        return reservaRepository.save(reserva);
+        Reserva guardada = reservaRepository.save(reserva);
+
+        emailService.enviarConfirmacionReservaEnSegundoPlano(
+                usuario.getEmail(), usuario.getNombre(), usuario.getApellido(),
+                guardada.getId(), producto.getNombre(), fechaInicio, fechaFin,
+                guardada.getCreatedAt(), producto.getContactoEmail(), producto.getContactoTelefono());
+
+        return guardada;
     }
 
     public void cancelar(Long reservaId, Long usuarioId) {

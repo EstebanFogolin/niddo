@@ -14,7 +14,9 @@ const AddProductForm = ({ onClose }) => {
         description: '',
         categoryId: '',
         images: [],
-        caracteristicas: []
+        caracteristicas: [],
+        contactoEmail: '',
+        contactoTelefono: ''
     })
 
     const [errors, setErrors] = useState({})
@@ -52,6 +54,11 @@ const AddProductForm = ({ onClose }) => {
                 if (oversized) return 'Cada imagen debe pesar menos de 5 MB.'
                 return ''
             }
+            case 'contactoEmail': {
+                const trimmed = value.trim()
+                if (trimmed && !trimmed.includes('@')) return 'El email de contacto no es válido.'
+                return ''
+            }
             default:
                 return ''
         }
@@ -76,7 +83,8 @@ const AddProductForm = ({ onClose }) => {
             name: validateField('name', formData.name),
             description: validateField('description', formData.description),
             categoryId: validateField('categoryId', formData.categoryId),
-            images: validateField('images', formData.images)
+            images: validateField('images', formData.images),
+            contactoEmail: validateField('contactoEmail', formData.contactoEmail)
         }
         setErrors(newErrors)
         return !Object.values(newErrors).some(Boolean)
@@ -163,9 +171,32 @@ const AddProductForm = ({ onClose }) => {
                         {errors.categoryId && <span className="field-error">{errors.categoryId}</span>}
                     </div>
 
-                    <div className={`form-group${errors.images ? ' has-error' : ''}`}>
-                        <label htmlFor="images">Imágenes</label>
+                    <div className={`form-group${errors.contactoEmail ? ' has-error' : ''}`}>
+                        <label htmlFor="contactoEmail">Email de contacto del proveedor (opcional)</label>
                         <input
+                            id="contactoEmail"
+                            type="email"
+                            name="contactoEmail"
+                            value={formData.contactoEmail}
+                            onChange={handleChange}
+                            placeholder="proveedor@ejemplo.com"
+                        />
+                        {errors.contactoEmail && <span className="field-error">{errors.contactoEmail}</span>}
+                    </div>
+
+                    <div className="form-group">
+                        <label htmlFor="contactoTelefono">Teléfono de contacto del proveedor (opcional)</label>
+                        <input
+                            id="contactoTelefono"
+                            type="tel"
+                            name="contactoTelefono"
+                            value={formData.contactoTelefono}
+                            onChange={handleChange}
+                            placeholder="+54 11 1234 5678"
+                        />
+                    </div>
+                    <div className={`form-group${errors.images ? ' has-error' : ''}`}>
+                        <label htmlFor="images">Imágenes</label>                        <input
                             id="images"
                             type="file"
                             accept=".jpg,.jpeg,.png,.webp"

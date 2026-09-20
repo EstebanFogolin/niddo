@@ -16,6 +16,9 @@ import AdminPanel from "./components/Admin/AdminPanel"
 import ProductDetail from "./components/ProductDetail/ProductDetail"
 import RegisterPage from "./components/Auth/RegisterPage"
 import LoginPage from "./components/Auth/LoginPage"
+import ReservationsPage from "./components/Reservations/ReservationsPage"
+import ReservationConfirmationPage from "./components/Reservations/ReservationConfirmationPage"
+import WhatsAppButton from "./components/WhatsApp/WhatsAppButton"
 
 
 // Home page con el layout completo (Header, Main, Footer)
@@ -55,7 +58,18 @@ export const App = () => {
               <AdminPanel />
             </RequireAdmin>
           } />
+          <Route path="/mis-reservas" element={
+            <RequireAuth>
+              <ReservationsPage />
+            </RequireAuth>
+          } />
+          <Route path="/reserva-confirmada" element={
+            <RequireAuth>
+              <ReservationConfirmationPage />
+            </RequireAuth>
+          } />
         </Routes>
+        <WhatsAppButton />
       </FavoritesProvider>
     </BrowserRouter>
   )

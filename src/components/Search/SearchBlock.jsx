@@ -4,7 +4,7 @@ import { useContext } from 'react'
 import './SearchBlock.css'
 
 const SearchBlock = () => {
-    const { products, selectedCategoryIds, clearCategoryFilters, fetchProducts } = useContext(ProductContext)
+    const { products, selectedCategoryIds, clearCategoryFilters, fetchProducts, fetchProductsWithAvailability } = useContext(ProductContext)
 
     const [query, setQuery] = useState('')
     const [debouncedQuery, setDebouncedQuery] = useState('')
@@ -37,10 +37,10 @@ const SearchBlock = () => {
         return () => { if (debounceRef.current) clearTimeout(debounceRef.current) }
     }, [query])
 
-    // Fetch: solo cuando cambia debouncedQuery o selectedCategoryIds
+    // Solo cargar productos iniciales (sin fechas)
     useEffect(() => {
-        fetchProducts(selectedCategoryIds, debouncedQuery)
-    }, [debouncedQuery, selectedCategoryIds, fetchProducts])
+        fetchProducts(selectedCategoryIds)
+    }, [fetchProducts, selectedCategoryIds])
 
     const handleSuggestionClick = useCallback((name) => {
         setQuery(name)
@@ -54,10 +54,22 @@ const SearchBlock = () => {
         else setFechaHasta(value)
     }, [])
 
-    const handleBuscar = useCallback(() => {
+    const handleBuscar = useCallback((e) => {
+        e.preventDefault()
         setIsSearching(true)
-        setTimeout(() => setIsSearching(false), 500)
-    }, [])
+        const term = query.trim()
+        setDebouncedQuery(term)
+        fetchProductsWithAvailability(selectedCategoryIds, term, fechaDesde, fechaHasta)
+        
+        // Scroll a recomendaciones después de un breve delay
+        setTimeout(() => {
+            const recomendaciones = document.getElementById('recomendaciones')
+            if (recomendaciones) {
+                recomendaciones.scrollIntoView({ behavior: 'smooth' })
+            }
+            setIsSearching(false)
+        }, 300)
+    }, [fetchProductsWithAvailability, selectedCategoryIds, query, fechaDesde, fechaHasta])
 
     const handleLimpiar = useCallback(() => {
         setQuery('')
@@ -66,7 +78,9 @@ const SearchBlock = () => {
         setDebouncedQuery('')
         clearCategoryFilters()
         setShowSuggestions(false)
-    }, [clearCategoryFilters])
+        // Recargar productos sin filtros de fecha
+        fetchProducts(selectedCategoryIds)
+    }, [clearCategoryFilters, fetchProducts, selectedCategoryIds])
 
     const today = new Date().toISOString().split('T')[0]
 
@@ -79,7 +93,7 @@ const SearchBlock = () => {
                 </p>
             </div>
 
-            <form className="search-form" onSubmit={(e) => e.preventDefault()}>
+            <form className="search-form" onSubmit={handleBuscar}>
                 <div className="search-row">
                     <div className="search-field search-field-main">
                         <label htmlFor="search-query" className="search-label">¿Qué buscás?</label>
@@ -139,7 +153,7 @@ const SearchBlock = () => {
                     <button type="button" className="search-btn-clear" onClick={handleLimpiar}>
                         Limpiar
                     </button>
-                    <button type="button" className="search-btn-primary" onClick={handleBuscar} disabled={isSearching}>
+                    <button type="submit" className="search-btn-primary" disabled={isSearching}>
                         {isSearching ? 'Buscando...' : 'Realizar búsqueda'}
                     </button>
                 </div>

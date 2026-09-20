@@ -25,6 +25,8 @@ const mapApiProductToCard = (product) => {
         img: resolveImageUrl(product.imagenes?.[0]),
         images: product.imagenes?.map(resolveImageUrl) || [],
         caracteristicas: product.caracteristicas || [],
+        contactoEmail: product.contactoEmail || '',
+        contactoTelefono: product.contactoTelefono || '',
         promedioPuntuacion: promedio,
         totalResenas: total,
         distribucionEstrellas: product.distribucionEstrellas || [0, 0, 0, 0, 0]
@@ -56,7 +58,7 @@ export const ProductProvider = ({ children }) => {
     const [categoriesLoading, setCategoriesLoading] = useState(false)
     const [selectedCategoryIds, setSelectedCategoryIds] = useState([])
 
-    const doFetchProducts = useCallback(async (categoriaIds, q) => {
+    const doFetchProducts = useCallback(async (categoriaIds, q, fechaInicio, fechaFin) => {
         try {
             setLoading(true)
             const params = new URLSearchParams()
@@ -66,9 +68,15 @@ export const ProductProvider = ({ children }) => {
             if (q && q.trim()) {
                 params.append('q', q.trim())
             }
+            if (fechaInicio) {
+                params.append('fechaInicio', fechaInicio)
+            }
+            if (fechaFin) {
+                params.append('fechaFin', fechaFin)
+            }
             const queryString = params.toString()
             const url = `${API_URL}/api/productos${queryString ? `?${queryString}` : ''}`
-            const data = await fetchJson(url)
+            const data = await fetchJson(url, { headers: getAuthHeaders() })
             const apiProducts = data.map(mapApiProductToCard)
             setProducts(apiProducts)
             setApiError('')
@@ -77,7 +85,36 @@ export const ProductProvider = ({ children }) => {
         } finally {
             setLoading(false)
         }
-    }, [])
+    }, [getAuthHeaders])
+
+    const fetchProductsWithAvailability = useCallback(async (categoriaIds, q, fechaInicio, fechaFin) => {
+        try {
+            setLoading(true)
+            const params = new URLSearchParams()
+            if (categoriaIds && categoriaIds.length > 0) {
+                params.append('categoriaIds', categoriaIds.join(','))
+            }
+            if (q && q.trim()) {
+                params.append('q', q.trim())
+            }
+            if (fechaInicio) {
+                params.append('fechaInicio', fechaInicio)
+            }
+            if (fechaFin) {
+                params.append('fechaFin', fechaFin)
+            }
+            const queryString = params.toString()
+            const url = `${API_URL}/api/productos${queryString ? `?${queryString}` : ''}`
+            const data = await fetchJson(url, { headers: getAuthHeaders() })
+            const apiProducts = data.map(mapApiProductToCard)
+            setProducts(apiProducts)
+            setApiError('')
+        } catch (e) {
+            setApiError(e.message || 'No se pudo conectar con el backend.')
+        } finally {
+            setLoading(false)
+        }
+    }, [getAuthHeaders])
 
     useEffect(() => {
         doFetchProducts(selectedCategoryIds)
@@ -213,14 +250,18 @@ export const ProductProvider = ({ children }) => {
 
     const fetchAvailability = useCallback(async (productId, desde, hasta) => {
         try {
-            const response = await fetch(`${API_URL}/api/reservas/producto/${productId}/disponibilidad?desde=${desde}&hasta=${hasta}`)
+            const headers = getAuthHeaders()
+            let response = await fetch(`${API_URL}/api/reservas/producto/${productId}/disponibilidad?desde=${desde}&hasta=${hasta}`, { headers })
+            if (response.status === 401 && headers.Authorization) {
+                response = await fetch(`${API_URL}/api/reservas/producto/${productId}/disponibilidad?desde=${desde}&hasta=${hasta}`)
+            }
             if (!response.ok) throw new Error('Error al cargar disponibilidad')
             return await response.json()
         } catch {
             console.warn('No se pudo cargar disponibilidad')
             return { fechasOcupadas: [], fechasDisponibles: [] }
         }
-    }, [])
+    }, [getAuthHeaders])
 
     const fetchProductById = useCallback(async (id) => {
         const numericId = String(id).replace(/^api-/, '')
@@ -228,7 +269,7 @@ export const ProductProvider = ({ children }) => {
         return mapApiProductToCard(product)
     }, [])
 
-    const updateProduct = useCallback(async (id, { name, description, categoryId, imagenes, caracteristicas }) => {
+    const updateProduct = useCallback(async (id, { name, description, categoryId, imagenes, caracteristicas, contactoEmail, contactoTelefono }) => {
         const data = new FormData()
         if (name) data.append('nombre', name)
         if (description) data.append('descripcion', description)
@@ -236,6 +277,8 @@ export const ProductProvider = ({ children }) => {
         if (caracteristicas && caracteristicas.length > 0) {
             caracteristicas.forEach(c => data.append('caracteristicas', c))
         }
+        if (contactoEmail !== undefined) data.append('contactoEmail', contactoEmail || '')
+        if (contactoTelefono !== undefined) data.append('contactoTelefono', contactoTelefono || '')
         if (imagenes && imagenes.length > 0) {
             imagenes.forEach(img => data.append('imagenes', img))
         }
@@ -252,11 +295,13 @@ export const ProductProvider = ({ children }) => {
         return mappedProduct
     }, [getAuthHeaders])
 
-    const addProduct = useCallback(async ({ name, description, categoryId, images, caracteristicas }) => {
+    const addProduct = useCallback(async ({ name, description, categoryId, images, caracteristicas, contactoEmail, contactoTelefono }) => {
         const data = new FormData()
         data.append('nombre', name)
         data.append('descripcion', description)
         if (categoryId) data.append('categoriaId', categoryId)
+        if (contactoEmail) data.append('contactoEmail', contactoEmail)
+        if (contactoTelefono) data.append('contactoTelefono', contactoTelefono)
 
         images.forEach((image) => {
             data.append('imagenes', image)
@@ -300,6 +345,7 @@ export const ProductProvider = ({ children }) => {
         toggleCategoryFilter,
         clearCategoryFilters,
         fetchProducts: doFetchProducts,
+        fetchProductsWithAvailability,
         fetchAvailability,
         fetchProductById
     }), [
@@ -325,6 +371,7 @@ export const ProductProvider = ({ children }) => {
         toggleCategoryFilter,
         clearCategoryFilters,
         doFetchProducts,
+        fetchProductsWithAvailability,
         fetchAvailability,
         fetchProductById
     ])

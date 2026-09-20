@@ -63,3 +63,44 @@
 .login-register-link a:hover {
     text-decoration: underline;
 }
+
+.login-auth-message {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px;
+    background: #fff8e1;
+    border: 1px solid #ffecb3;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    color: #5d4037;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.login-auth-message svg {
+    flex-shrink: 0;
+    margin-top: 2px;
+    color: #e8b923;
+}
+
+.login-auth-message-content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.login-auth-message-content strong {
+    color: #2F3A6B;
+    font-weight: 700;
+}
+
+.auth-register-link {
+    color: #e8b923;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.auth-register-link:hover {
+    text-decoration: underline;
+}

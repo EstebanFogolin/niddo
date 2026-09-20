@@ -26,7 +26,7 @@ const Recommendations = () => {
     }, [products])
 
     return (
-        <section className="recommendations-section">
+        <section id="recomendaciones" className="recommendations-section">
             <div className="recommendations-header">
                 <h2 className="recommendations-title">Recomendaciones</h2>
             </div>
