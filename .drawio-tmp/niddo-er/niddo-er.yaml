@@ -1,0 +1,195 @@
+# Niddo — Diagrama Entidad-Relación
+# Fuente: entidades JPA en backend/.../com.digitalhouse.reservas
+meta:
+  title: Niddo — Diagrama Entidad-Relación
+  description: Tablas y claves foráneas de la plataforma de reservas de hospedajes
+  profile: default
+  theme: tech-blue
+  source: generated
+  routing: orthogonal
+
+nodes:
+  - id: usuarios
+    label: |-
+      USUARIOS
+      id BIGINT PK
+      nombre VARCHAR NN
+      apellido VARCHAR NN
+      email VARCHAR UQ NN
+      password VARCHAR NN
+      role VARCHAR NN
+    type: process
+    position: { x: 180, y: 100 }
+
+  - id: productos
+    label: |-
+      PRODUCTOS
+      id BIGINT PK
+      nombre VARCHAR UQ NN
+      descripcion VARCHAR(1000) NN
+      contacto_email VARCHAR
+      contacto_telefono VARCHAR
+      categoria_id BIGINT FK
+    type: process
+    position: { x: 570, y: 100 }
+
+  - id: categorias
+    label: |-
+      CATEGORIAS
+      id BIGINT PK
+      titulo VARCHAR UQ NN
+      descripcion VARCHAR NN
+      imagen_url VARCHAR NN
+    type: process
+    position: { x: 1000, y: 100 }
+
+  - id: caracteristicas
+    label: |-
+      CARACTERISTICAS
+      id BIGINT PK
+      nombre VARCHAR UQ NN
+      icono VARCHAR NN
+    type: process
+    position: { x: 1000, y: 340 }
+
+  - id: producto_caracteristicas
+    label: |-
+      PRODUCTO_CARACTERISTICAS
+      producto_id BIGINT PK FK
+      caracteristica_id BIGINT PK FK
+    type: process
+    position: { x: 1000, y: 550 }
+
+  - id: producto_imagenes
+    label: |-
+      PRODUCTO_IMAGENES
+      producto_id BIGINT FK NN
+      url VARCHAR NN
+    type: process
+    position: { x: 570, y: 420 }
+
+  - id: reservas
+    label: |-
+      RESERVAS
+      id BIGINT PK
+      producto_id BIGINT FK NN
+      usuario_id BIGINT FK NN
+      fecha_inicio DATE NN
+      fecha_fin DATE NN
+      estado ENUM NN
+      created_at TIMESTAMP NN
+    type: process
+    position: { x: 180, y: 390 }
+
+  - id: favoritos
+    label: |-
+      FAVORITOS
+      id BIGINT PK
+      usuario_id BIGINT FK NN
+      producto_id BIGINT FK NN
+      UQ(usuario_id, producto_id)
+      created_at TIMESTAMP NN
+    type: process
+    position: { x: 180, y: 710 }
+
+  - id: resenas
+    label: |-
+      RESENAS
+      id BIGINT PK
+      producto_id BIGINT FK NN
+      usuario_id BIGINT FK NN
+      puntuacion INT 1-5 NN
+      comentario VARCHAR(2000)
+      UQ(usuario_id, producto_id)
+      created_at / updated_at
+    type: process
+    position: { x: 570, y: 590 }
+
+edges:
+  - from: productos
+    to: categorias
+    type: primary
+    label: 'N:1'
+
+  - from: producto_imagenes
+    to: productos
+    type: primary
+    label: 'N:1'
+
+  - from: producto_caracteristicas
+    to: productos
+    type: primary
+    label: 'N:1'
+    labelPosition: start
+    labelOffset: { x: 0, y: -18 }
+    waypoints:
+      - x: 760
+        y: 470
+      - x: 760
+        y: 250
+      - x: 560
+        y: 250
+
+  - from: producto_caracteristicas
+    to: caracteristicas
+    type: primary
+    label: 'N:1'
+
+  - from: reservas
+    to: productos
+    type: primary
+    label: 'N:1'
+    labelOffset: { x: -20, y: 0 }
+
+  - from: reservas
+    to: usuarios
+    type: primary
+    label: 'N:1'
+
+  - from: favoritos
+    to: usuarios
+    type: primary
+    label: 'N:1'
+    labelPosition: end
+    labelOffset: { x: 20, y: 0 }
+    waypoints:
+      - x: 52
+        y: 708
+      - x: 52
+        y: 100
+
+  - from: favoritos
+    to: productos
+    type: primary
+    label: 'N:1'
+    labelPosition: start
+    labelOffset: { x: 20, y: 0 }
+    waypoints:
+      - x: 390
+        y: 700
+      - x: 390
+        y: 100
+
+  - from: resenas
+    to: productos
+    type: primary
+    label: 'N:1'
+    labelPosition: end
+    labelOffset: { x: -20, y: 0 }
+    waypoints:
+      - x: 730
+        y: 588
+      - x: 730
+        y: 100
+
+  - from: resenas
+    to: usuarios
+    type: primary
+    label: 'N:1'
+    labelPosition: center
+    labelOffset: { x: -40, y: 0 }
+    waypoints:
+      - x: 28
+        y: 588
+      - x: 28
+        y: 100

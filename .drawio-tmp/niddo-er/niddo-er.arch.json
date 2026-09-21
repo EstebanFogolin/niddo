@@ -1,0 +1,134 @@
+{
+  "version": 1,
+  "title": "Niddo ??? Diagrama Entidad-Relaci??n",
+  "type": "flow-diagram",
+  "source": "generated",
+  "profile": "default",
+  "theme": "tech-blue",
+  "layout": "horizontal",
+  "counts": {
+    "nodes": 9,
+    "edges": 10,
+    "modules": 0
+  },
+  "nodes": [
+    {
+      "id": "usuarios",
+      "label": "USUARIOS\nid BIGINT PK\nnombre VARCHAR NN\napellido VARCHAR NN\nemail VARCHAR UQ NN\npassword VARCHAR NN\nrole VARCHAR NN",
+      "type": "process"
+    },
+    {
+      "id": "productos",
+      "label": "PRODUCTOS\nid BIGINT PK\nnombre VARCHAR UQ NN\ndescripcion VARCHAR(1000) NN\ncontacto_email VARCHAR\ncontacto_telefono VARCHAR\ncategoria_id BIGINT FK",
+      "type": "process"
+    },
+    {
+      "id": "categorias",
+      "label": "CATEGORIAS\nid BIGINT PK\ntitulo VARCHAR UQ NN\ndescripcion VARCHAR NN\nimagen_url VARCHAR NN",
+      "type": "process"
+    },
+    {
+      "id": "caracteristicas",
+      "label": "CARACTERISTICAS\nid BIGINT PK\nnombre VARCHAR UQ NN\nicono VARCHAR NN",
+      "type": "process"
+    },
+    {
+      "id": "producto_caracteristicas",
+      "label": "PRODUCTO_CARACTERISTICAS\nproducto_id BIGINT PK FK\ncaracteristica_id BIGINT PK FK",
+      "type": "process"
+    },
+    {
+      "id": "producto_imagenes",
+      "label": "PRODUCTO_IMAGENES\nproducto_id BIGINT FK NN\nurl VARCHAR NN",
+      "type": "process"
+    },
+    {
+      "id": "reservas",
+      "label": "RESERVAS\nid BIGINT PK\nproducto_id BIGINT FK NN\nusuario_id BIGINT FK NN\nfecha_inicio DATE NN\nfecha_fin DATE NN\nestado ENUM NN\ncreated_at TIMESTAMP NN",
+      "type": "process"
+    },
+    {
+      "id": "favoritos",
+      "label": "FAVORITOS\nid BIGINT PK\nusuario_id BIGINT FK NN\nproducto_id BIGINT FK NN\nUQ(usuario_id, producto_id)\ncreated_at TIMESTAMP NN",
+      "type": "process"
+    },
+    {
+      "id": "resenas",
+      "label": "RESENAS\nid BIGINT PK\nproducto_id BIGINT FK NN\nusuario_id BIGINT FK NN\npuntuacion INT 1-5 NN\ncomentario VARCHAR(2000)\nUQ(usuario_id, producto_id)\ncreated_at / updated_at",
+      "type": "process"
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-1",
+      "from": "productos",
+      "to": "categorias",
+      "type": "primary",
+      "label": "N:1"
+    },
+    {
+      "id": "edge-2",
+      "from": "producto_imagenes",
+      "to": "productos",
+      "type": "primary",
+      "label": "N:1"
+    },
+    {
+      "id": "edge-3",
+      "from": "producto_caracteristicas",
+      "to": "productos",
+      "type": "primary",
+      "label": "N:1"
+    },
+    {
+      "id": "edge-4",
+      "from": "producto_caracteristicas",
+      "to": "caracteristicas",
+      "type": "primary",
+      "label": "N:1"
+    },
+    {
+      "id": "edge-5",
+      "from": "reservas",
+      "to": "productos",
+      "type": "primary",
+      "label": "N:1"
+    },
+    {
+      "id": "edge-6",
+      "from": "reservas",
+      "to": "usuarios",
+      "type": "primary",
+      "label": "N:1"
+    },
+    {
+      "id": "edge-7",
+      "from": "favoritos",
+      "to": "usuarios",
+      "type": "primary",
+      "label": "N:1"
+    },
+    {
+      "id": "edge-8",
+      "from": "favoritos",
+      "to": "productos",
+      "type": "primary",
+      "label": "N:1"
+    },
+    {
+      "id": "edge-9",
+      "from": "resenas",
+      "to": "productos",
+      "type": "primary",
+      "label": "N:1"
+    },
+    {
+      "id": "edge-10",
+      "from": "resenas",
+      "to": "usuarios",
+      "type": "primary",
+      "label": "N:1"
+    }
+  ],
+  "modules": []
+}
